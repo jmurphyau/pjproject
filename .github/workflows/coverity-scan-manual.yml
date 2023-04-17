@@ -3,7 +3,7 @@
 
 name: "Coverity Scan (Manual)"
 
-on: [workflow_dispatch]
+# on: [workflow_dispatch]
 
 jobs:
   ubuntu-full-bundle:

@@ -86,3 +86,7 @@ tests/fuzz/*.o
 cov-int/
 getversion.mak
 configure.out
+
+# Swift package manager
+.build/
+.swiftpm/

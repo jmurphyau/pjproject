@@ -1,0 +1,97 @@
+/*
+module pjmedia {
+    //header "shim_pjmedia.h"
+    module types { header "pjmedia/types.h" export types }
+    module alaw_ulaw { header "pjmedia/alaw_ulaw.h" export alaw_ulaw }
+    module avi_stream { header "pjmedia/avi_stream.h" export avi_stream }
+    module bidirectional { header "pjmedia/bidirectional.h" export bidirectional }
+    module circbuf { header "pjmedia/circbuf.h" export circbuf }
+    module clock { header "pjmedia/clock.h" export clock }
+    module codec { header "pjmedia/codec.h" export codec }
+    module conference { header "pjmedia/conference.h" export conference }
+    module converter { header "pjmedia/converter.h" export converter }
+    module delaybuf { header "pjmedia/delaybuf.h" export delaybuf }
+    module echo { header "pjmedia/echo.h" export echo }
+    module echo_port { header "pjmedia/echo_port.h" export echo_port }
+    module endpoint { header "pjmedia/endpoint.h" export endpoint }
+    module errno { header "pjmedia/errno.h" export errno }
+    module event { header "pjmedia/event.h" export event }
+    module frame { header "pjmedia/frame.h" export frame }
+    module format { header "pjmedia/format.h" export format }
+    module g711 { header "pjmedia/g711.h" export g711 }
+    module jbuf { header "pjmedia/jbuf.h" export jbuf }
+    module master_port { header "pjmedia/master_port.h" export master_port }
+    module mem_port { header "pjmedia/mem_port.h" export mem_port }
+    module null_port { header "pjmedia/null_port.h" export null_port }
+    module plc { header "pjmedia/plc.h" export plc }
+    module port { header "pjmedia/port.h" export port }
+    module resample { header "pjmedia/resample.h" export resample }
+    module rtcp { header "pjmedia/rtcp.h" export rtcp }
+    module rtcp_xr { header "pjmedia/rtcp_xr.h" export rtcp_xr }
+    module rtp { header "pjmedia/rtp.h" export rtp }
+    module sdp { header "pjmedia/sdp.h" export sdp }
+    module sdp_neg { header "pjmedia/sdp_neg.h" export sdp_neg }
+    module silencedet { header "pjmedia/silencedet.h" export silencedet }
+    module sound { header "pjmedia/sound.h" export sound }
+    module sound_port { header "pjmedia/sound_port.h" export sound_port }
+    module splitcomb { header "pjmedia/splitcomb.h" export splitcomb }
+    module stereo { header "pjmedia/stereo.h" export stereo }
+    module stream { header "pjmedia/stream.h" export stream }
+    module stream_common { header "pjmedia/stream_common.h" export stream_common }
+    module tonegen { header "pjmedia/tonegen.h" export tonegen }
+    module transport { header "pjmedia/transport.h" export transport }
+    module transport_adapter_sample { header "pjmedia/transport_adapter_sample.h" export transport_adapter_sample }
+    module transport_ice { header "pjmedia/transport_ice.h" export transport_ice }
+    module transport_loop { header "pjmedia/transport_loop.h" export transport_loop }
+    module transport_srtp { header "pjmedia/transport_srtp.h" export transport_srtp }
+    module transport_udp { header "pjmedia/transport_udp.h" export transport_udp }
+    module vid_codec { header "pjmedia/vid_codec.h" export vid_codec }
+    module vid_conf { header "pjmedia/vid_conf.h" export vid_conf }
+    module vid_port { header "pjmedia/vid_port.h" export vid_port }
+    module vid_stream { header "pjmedia/vid_stream.h" export vid_stream }
+    module wav_playlist { header "pjmedia/wav_playlist.h" export wav_playlist }
+    module wav_port { header "pjmedia/wav_port.h" export wav_port }
+    module wave { header "pjmedia/wave.h" export wave }
+    module wsola { header "pjmedia/wsola.h" export wsola }
+export pjmedia
+}
+
+
+
+module pjmedia_audiodev {
+    header "shim_pjmedia_audiodev.h"
+    export *
+}
+
+module pjmedia_codec {
+    header "shim_pjmedia_codec.h"
+    export *
+}
+
+module pjmedia_videodev {
+    header "shim_pjmedia_videodev.h"
+    export *
+}
+
+
+*/
+
+module pjmedia {
+    header "shim_pjmedia.h"
+    export *
+}
+
+module pjmedia_audiodev {
+    header "shim_pjmedia_audiodev.h"
+    export *
+}
+
+module pjmedia_codec {
+    header "shim_pjmedia_codec.h"
+    export *
+}
+
+module pjmedia_videodev {
+    header "shim_pjmedia_videodev.h"
+    export *
+}

@@ -1,0 +1,10 @@
+
+module srtp {
+    header "shim.h"
+    export *
+}
+
+module crypto_kernel {
+    header "../../crypto/include/crypto_kernel.h"
+    export *
+}

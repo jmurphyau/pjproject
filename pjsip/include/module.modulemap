@@ -1,0 +1,23 @@
+module pjsip {
+    header "shim_pjsip.h"
+    export *
+}
+
+module pjsip_simple {
+    header "shim_pjsip_simple.h"
+    export *
+}
+
+
+module pjsip_ua {
+    //header "shim_pjsip_ua.h"
+    module sip_inv { header "pjsip-ua/sip_inv.h" export sip_inv }
+    module sip_regc { header "pjsip-ua/sip_regc.h" export sip_regc }
+    module sip_replaces { header "pjsip-ua/sip_replaces.h" export sip_replaces }
+    module sip_xfer { header "pjsip-ua/sip_xfer.h" export sip_xfer }
+    module sip_100rel { header "pjsip-ua/sip_100rel.h" export sip_100rel }
+    module sip_timer { header "pjsip-ua/sip_timer.h" export sip_timer }
+    export pjsip_ua
+}
+
+

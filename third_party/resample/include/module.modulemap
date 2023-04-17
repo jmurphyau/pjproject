@@ -1,0 +1,5 @@
+
+module resample {
+    header "shim.h"
+    export resample
+}

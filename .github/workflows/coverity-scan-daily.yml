@@ -3,9 +3,9 @@
 
 name: "Coverity Scan (Daily)"
 
-on:
-  schedule:
-    - cron: '0 12 * * *'   # Daily at 12:00 UTC
+# on:
+#   schedule:
+#     - cron: '0 12 * * *'   # Daily at 12:00 UTC
 
 jobs:
   ubuntu-full-bundle:

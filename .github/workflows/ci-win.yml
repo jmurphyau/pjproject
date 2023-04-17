@@ -1,10 +1,10 @@
 name: CI Windows
-on:
-  push:
-    branches:
-      - 'master'
-  pull_request:
-    types: [opened, synchronize, reopened]
+# on:
+#   push:
+#     branches:
+#       - 'master'
+#   pull_request:
+#     types: [opened, synchronize, reopened]
 jobs:
   build-windows-default:
     runs-on: windows-latest
@@ -326,7 +326,7 @@ jobs:
     - name: MSBuild
       working-directory: .
       run: |
-        set /P FFMPEG_DIR=<ffmpeg_dir.txt        
+        set /P FFMPEG_DIR=<ffmpeg_dir.txt
         set /P LIBSDL_DIR=<sdl_dir.txt
         call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
         set INCLUDE=%INCLUDE%;%LIBFFMPEG_DIR%\include;%SDL_DIR%\include
