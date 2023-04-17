@@ -323,7 +323,7 @@ struct MakePackage {
     var name: String
     let paths: MakePaths
     let c: COptions
-    let cxx: CXXOptions
+    var cxx: CXXOptions
     let ld: LibOptions
     var objects: [String]
     var objectFileUrls: [URL] {
@@ -408,7 +408,475 @@ struct MakePackage {
         )
     }
 }
+#if os(linux)
+let make_pjlib = MakePackage(
+    name: "pjlib",
+    paths: MakePaths(makefile: "pjlib/build", source: "../src/pj"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["ioqueue_epoll.o", "file_access_unistd.o", "file_io_ansi.o", "os_core_unix.o", "os_error_unix.o", "os_time_unix.o", "os_timestamp_posix.o", "sock_qos_bsd.o", "guid_simple.o", "addr_resolv_sock.o", "log_writer_stdout.o", "os_timestamp_common.o", "pool_policy_malloc.o", "sock_bsd.o", "sock_select.o", "activesock.o", "array.o", "config.o", "ctype.o", "errno.o", "except.o", "fifobuf.o", "guid.o", "hash.o", "ip_helper_generic.o", "list.o", "lock.o", "log.o", "os_time_common.o", "os_info.o", "pool.o", "pool_buf.o", "pool_caching.o", "pool_dbg.o", "rand.o", "rbtree.o", "sock_common.o", "sock_qos_common.o", "ssl_sock_common.o", "ssl_sock_ossl.o", "ssl_sock_gtls.o", "ssl_sock_dump.o", "ssl_sock_darwin.o", "string.o", "timer.o", "types.o"]
+)
+let make_pjlib_util = MakePackage(
+    name: "pjlib_util",
+    paths: MakePaths(makefile: "pjlib-util/build", source: "../src/pjlib-util"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib/include", "../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib/include", "../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["base64.o", "cli.o", "cli_console.o", "cli_telnet.o", "crc32.o", "errno.o", "dns.o", "dns_dump.o", "dns_server.o", "getopt.o", "hmac_md5.o", "hmac_sha1.o", "http_client.o", "json.o", "md5.o", "pcap.o", "resolver.o", "scanner.o", "sha1.o", "srv_resolver.o", "string.o", "stun_simple.o", "stun_simple_client.o", "xml.o"]
+)
+let make_pjsip = MakePackage(
+    name: "pjsip",
+    paths: MakePaths(makefile: "pjsip/build", source: "../src/pjsip"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjlib-util-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["sip_config.o", "sip_multipart.o", "sip_errno.o", "sip_msg.o", "sip_parser.o", "sip_tel_uri.o", "sip_uri.o", "sip_endpoint.o", "sip_util.o", "sip_util_proxy.o", "sip_resolve.o", "sip_transport.o", "sip_transport_loop.o", "sip_transport_udp.o", "sip_transport_tcp.o", "sip_transport_tls.o", "sip_auth_aka.o", "sip_auth_client.o", "sip_auth_msg.o", "sip_auth_parser.o", "sip_auth_server.o", "sip_transaction.o", "sip_util_statefull.o", "sip_dialog.o", "sip_ua_layer.o"]
+)
+let make_pjsip_simple = MakePackage(
+    name: "pjsip_simple",
+    paths: MakePaths(makefile: "pjsip/build", source: "../src/pjsip-simple"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjlib-util-x86_64-unknown-linux-gnu", "pjsip-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["errno.o", "evsub.o", "evsub_msg.o", "iscomposing.o", "mwi.o", "pidf.o", "presence.o", "presence_body.o", "publishc.o", "rpid.o", "xpidf.o"]
+)
+let make_pjsip_ua = MakePackage(
+    name: "pjsip_ua",
+    paths: MakePaths(makefile: "pjsip/build", source: "../src/pjsip-ua"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjlib-util-x86_64-unknown-linux-gnu", "pjmedia-x86_64-unknown-linux-gnu", "pjsip-simple-x86_64-unknown-linux-gnu", "pjsip-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["sip_inv.o", "sip_reg.o", "sip_replaces.o", "sip_xfer.o", "sip_100rel.o", "sip_timer.o"]
+)
+let make_pjnath = MakePackage(
+    name: "pjnath",
+    paths: MakePaths(makefile: "pjnath/build", source: "../src/pjnath"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: ["../../pjlib-util/include", "../../pjlib/include", "../include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjlib-util-x86_64-unknown-linux-gnu", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["errno.o", "ice_session.o", "ice_strans.o", "nat_detect.o", "stun_auth.o", "stun_msg.o", "stun_msg_dump.o", "stun_session.o", "stun_sock.o", "stun_transaction.o", "turn_session.o", "turn_sock.o", "upnp.o"]
+)
+let make_pjmedia = MakePackage(
+    name: "pjmedia",
+    paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjlib-util-x86_64-unknown-linux-gnu", "pjnath-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["alaw_ulaw.o", "alaw_ulaw_table.o", "avi_player.o", "bidirectional.o", "clock_thread.o", "codec.o", "conference.o", "conf_switch.o", "converter.o", "converter_libswscale.o", "converter_libyuv.o", "delaybuf.o", "echo_common.o", "echo_port.o", "echo_suppress.o", "echo_webrtc.o", "echo_webrtc_aec3.o", "endpoint.o", "errno.o", "event.o", "format.o", "ffmpeg_util.o", "g711.o", "jbuf.o", "master_port.o", "mem_capture.o", "mem_player.o", "null_port.o", "plc_common.o", "port.o", "splitcomb.o", "resample_resample.o", "resample_libsamplerate.o", "resample_speex.o", "resample_port.o", "rtcp.o", "rtcp_xr.o", "rtcp_fb.o", "rtp.o", "sdp.o", "sdp_cmp.o", "sdp_neg.o", "session.o", "silencedet.o", "sound_legacy.o", "sound_port.o", "stereo_port.o", "stream_common.o", "stream.o", "stream_info.o", "tonegen.o", "transport_adapter_sample.o", "transport_ice.o", "transport_loop.o", "transport_srtp.o", "transport_udp.o", "types.o", "vid_codec.o", "vid_codec_util.o", "vid_port.o", "vid_stream.o", "vid_stream_info.o", "vid_conf.o", "wav_player.o", "wav_playlist.o", "wav_writer.o", "wave.o", "wsola.o", "audiodev.o", "videodev.o"]
+)
+let make_pjmedia_videodev = MakePackage(
+    name: "pjmedia_videodev",
+    paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia-videodev"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjmedia-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["sdl_dev.o", "videodev.o", "errno.o", "avi_dev.o", "ffmpeg_dev.o", "colorbar_dev.o", "v4l2_dev.o", "opengl_dev.o", "util.o"]
+)
+let make_pjmedia_audiodev = MakePackage(
+    name: "pjmedia_audiodev",
+    paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia-audiodev"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjmedia-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["audiodev.o", "audiotest.o", "errno.o", "legacy_dev.o", "null_dev.o", "pa_dev.o", "wmme_dev.o", "alsa_dev.o", "bb10_dev.o", "bdimad_dev.o", "android_jni_dev.o", "opensl_dev.o", "oboe_dev.o"]
+)
+let make_pjmedia_codec = MakePackage(
+    name: "pjmedia_codec",
+    paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia-codec"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
+        ),
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pjmedia-x86_64-unknown-linux-gnu", "pthread", "resample-x86_64-unknown-linux-gnu", "rt", "srtp-x86_64-unknown-linux-gnu", "ssl", "stdc++", "yuv-x86_64-unknown-linux-gnu"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["audio_codecs.o", "ffmpeg_vid_codecs.o", "openh264.o", "h263_packetizer.o", "h264_packetizer.o", "vpx_packetizer.o", "ipp_codecs.o", "silk.o", "opus.o", "g7221_sdp_match.o", "amr_sdp_match.o", "passthrough.o", "vpx.o"]
+)
+let make_srtp = MakePackage(
+    name: "srtp",
+    paths: MakePaths(makefile: "third_party/build/srtp", source: "../../srtp"),
+    c: COptions(
+        defines: CDefines(
+            noValue: ["HAVE_CONFIG_H", "OPENSSL"],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../srtp/crypto/include", "../../srtp/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../srtp/crypto/include", "../../srtp/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pj-x86_64-unknown-linux-gnu", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: ["/path/to/pjsip/pjproject/pjlib-util/lib", "/path/to/pjsip/pjproject/pjlib/lib", "/path/to/pjsip/pjproject/pjmedia/lib", "/path/to/pjsip/pjproject/pjnath/lib", "/path/to/pjsip/pjproject/pjsip/lib", "/path/to/pjsip/pjproject/third_party/lib"],
+        others: []
+    ),
+    objects: ["crypto/cipher/cipher.o", "crypto/cipher/null_cipher.o", "crypto/cipher/aes_icm_ossl.o", "crypto/cipher/aes_gcm_ossl.o", "crypto/hash/null_auth.o", "crypto/hash/auth.o", "crypto/hash/hmac_ossl.o", "crypto/math/datatypes.o", "crypto/math/stat.o", "crypto/kernel/crypto_kernel.o", "crypto/kernel/alloc.o", "crypto/kernel/key.o", "pjlib/srtp_err.o", "crypto/replay/rdb.o", "crypto/replay/rdbx.o", "crypto/replay/ut_sim.o", "srtp/srtp.o", "srtp/ekt.o"]
+)
+let make_ilbc = MakePackage(
+    name: "ilbc",
+    paths: MakePaths(makefile: "third_party/build/ilbc", source: "../../ilbc"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../ilbc"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../ilbc"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: [],
+        others: []
+    ),
+    objects: ["FrameClassify.o", "LPCdecode.o", "LPCencode.o", "StateConstructW.o", "StateSearchW.o", "anaFilter.o", "constants.o", "createCB.o", "doCPLC.o", "enhancer.o", "filter.o", "gainquant.o", "getCBvec.o", "helpfun.o", "hpInput.o", "hpOutput.o", "iCBConstruct.o", "iCBSearch.o", "iLBC_decode.o", "iLBC_encode.o", "lsf.o", "packing.o", "syntFilter.o"]
+)
+let make_webrtc = MakePackage(
+    name: "webrtc",
+    paths: MakePaths(makefile: "third_party/build/webrtc", source: "../../webrtc/src/webrtc/"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../webrtc/src"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../webrtc/src"],
+        others: ["-O2", "-Wall"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: [],
+        others: []
+    ),
+    objects: ["modules/audio_processing/aec/aec_core.o", "modules/audio_processing/aec/aec_rdft.o", "modules/audio_processing/aec/aec_resampler.o", "modules/audio_processing/aec/echo_cancellation.o", "modules/audio_processing/aecm/aecm_core.o", "modules/audio_processing/aecm/echo_control_mobile.o", "modules/audio_processing/ns/noise_suppression.o", "modules/audio_processing/ns/noise_suppression_x.o", "modules/audio_processing/ns/ns_core.o", "modules/audio_processing/ns/nsx_core.o", "modules/audio_processing/utility/delay_estimator_wrapper.o", "modules/audio_processing/utility/delay_estimator.o", "common_audio/fft4g.o", "common_audio/ring_buffer.o", "common_audio/signal_processing/complex_bit_reverse.o", "common_audio/signal_processing/complex_fft.o", "common_audio/signal_processing/copy_set_operations.o", "common_audio/signal_processing/cross_correlation.o", "common_audio/signal_processing/division_operations.o", "common_audio/signal_processing/downsample_fast.o", "common_audio/signal_processing/energy.o", "common_audio/signal_processing/get_scaling_square.o", "common_audio/signal_processing/min_max_operations.o", "common_audio/signal_processing/randomization_functions.o", "common_audio/signal_processing/real_fft.o", "common_audio/signal_processing/spl_init.o", "common_audio/signal_processing/spl_sqrt.o", "common_audio/signal_processing/spl_sqrt_floor.o", "common_audio/signal_processing/vector_scaling_operations.o"]
+)
+let make_resample = MakePackage(
+    name: "resample",
+    paths: MakePaths(makefile: "third_party/build/resample", source: "../../resample/src"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../resample/include"],
+        others: ["-O2", "-Wall"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../resample/include"],
+        others: ["-O2", "-Wall", "-g"]
+    ),
+    ld: LibOptions(
+        libs: ["asound", "crypto", "m", "openh264", "pthread", "rt", "ssl", "stdc++"],
+        frameworks: [],
+        search: [],
+        others: []
+    ),
+    objects: ["resamplesubs.o"]
+)
+let make_yuv = MakePackage(
+    name: "yuv",
+    paths: MakePaths(makefile: "third_party/build/yuv", source: "../../yuv/source"),
+    c: COptions(
+        defines: CDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../yuv/include"],
+        others: ["-O2", "-Wall", "-Wno-memset-elt-size", "-Wno-pragmas", "-Wno-unknown-warning-option", "-fno-strict-aliasing", "-fomit-frame-pointer"]
+    ),
+    cxx: CXXOptions(
+        defines: CXXDefines(
+            noValue: [],
+            asZero: ["PJ_IS_BIG_ENDIAN"],
+            asOne: ["PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            others: []
+        ),
+        includes: [".", "../../../pjlib/include", "../../yuv/include"],
+        others: ["-O2", "-Wall", "-Wno-memset-elt-size", "-Wno-pragmas", "-Wno-unknown-warning-option", "-fno-strict-aliasing", "-fomit-frame-pointer", "-g"]
+    ),
+    ld: LibOptions(
+        libs: [],
+        frameworks: [],
+        search: [],
+        others: []
+    ),
+    objects: ["compare.o", "compare_common.o", "compare_gcc.o", "compare_neon64.o", "compare_neon.o", "compare_win.o", "convert_argb.o", "convert.o", "convert_from_argb.o", "convert_from.o", "convert_jpeg.o", "convert_to_argb.o", "convert_to_i420.o", "cpu_id.o", "mjpeg_decoder.o", "mjpeg_validate.o", "planar_functions.o", "rotate_any.o", "rotate_argb.o", "rotate.o", "rotate_common.o", "rotate_gcc.o", "rotate_dspr2.o", "rotate_neon64.o", "rotate_neon.o", "rotate_win.o", "row_any.o", "row_common.o", "row_gcc.o", "row_dspr2.o", "row_neon64.o", "row_neon.o", "row_win.o", "scale_any.o", "scale_argb.o", "scale.o", "scale_common.o", "scale_gcc.o", "scale_dspr2.o", "scale_neon64.o", "scale_neon.o", "scale_win.o", "video_common.o"]
+)
 
+
+#elseif os(macOS)
 
 let make_pjlib = MakePackage(
     name: "pjlib",
@@ -658,10 +1126,6 @@ var make_pjmedia_videodev = MakePackage(
     ),
     objects: ["darwin_dev.o", "sdl_dev_m.o", "videodev.o", "errno.o", "avi_dev.o", "ffmpeg_dev.o", "colorbar_dev.o", "v4l2_dev.o", "opengl_dev.o", "util.o"]
 )
-
-#if os(linux)
-make_pjmedia_videodev.objects = ["sdl_dev.o", "videodev.o", "errno.o", "avi_dev.o", "ffmpeg_dev.o", "colorbar_dev.o", "v4l2_dev.o", "opengl_dev.o", "util.o"]
-#endif
 
 let make_pjmedia_audiodev = MakePackage(
     name: "pjmedia_audiodev",
@@ -1121,3 +1585,4 @@ let package = Package(
     ]
 )
 
+#endif
