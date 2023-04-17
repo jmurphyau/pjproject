@@ -408,7 +408,7 @@ struct MakePackage {
         )
     }
 }
-#if os(linux)
+#if os(Linux)
 let make_pjlib = MakePackage(
     name: "pjlib",
     paths: MakePaths(makefile: "pjlib/build", source: "../src/pj"),
