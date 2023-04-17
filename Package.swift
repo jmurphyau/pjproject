@@ -71,10 +71,10 @@ ProcessInfo.processInfo.environment.forEach { (k,v) in
 ProcessInfo.processInfo.arguments.forEach { arg in
     print("arg \(arg)")
 }
-
+ */
 let pjprojectDebug = ProcessInfo.processInfo.environment.keys.contains(where: { $0 == "PJPROJECT_DEBUG" }) ?? false
 let pjprojectDebugLib = ProcessInfo.processInfo.environment["PJPROJECT_DEBUG_LIB"] ?? ""
-*/
+
 //
 //if let envPath = ProcessInfo.processInfo.environment["PATH"] {
 //    envPath.split(separator: ":").map { path in
