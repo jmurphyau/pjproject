@@ -41,6 +41,44 @@ supported_frameworks.append(.linkedFramework("QuartzCore"))
 supported_frameworks.append(.linkedFramework("VideoToolbox"))
 #endif
 
+let pathRoot = URL(fileURLWithPath: #file).deletingLastPathComponent()
+let pathConfigure = URL(fileURLWithPath: "configure-spm", relativeTo: pathRoot)
+let pathConfigSpm = URL(fileURLWithPath: "pjlib/include/pj/config_spm.h", relativeTo: pathRoot)
+let pathConfigSite = URL(fileURLWithPath: "pjlib/include/pj/config_site.h", relativeTo: pathRoot)
+
+let configureDisable = [ "android-mediacodec", "bcg729", "ffmpeg", "g722-codec", "g7221-codec", "gsm-codec", "ilbc-codec", "l16-codec", "libwebrtc", "opencore-amr", "opus", "pjsua2", "silk", "speex-aec", "speex-codec", "upnp", "v4l2", "vpx" ]
+let configureEnable = ["epoll", "kqueue"]
+
+let pathCp = ProcessInfo.processInfo.environment["PATH"]?.split(separator: ":").map { URL(fileURLWithPath: "cp", relativeTo: URL(fileURLWithPath: String($0))) }.filter { (try? $0.checkResourceIsReachable()) ?? false }.first
+
+print(pathCp?.absoluteURL.path)
+print(pathConfigSpm.absoluteURL.path)
+print(pathConfigSite.absoluteURL.path)
+
+print(pathConfigure.absoluteURL.path)
+print(configureDisable.map { "--disable-\($0)" } + configureEnable.map { "--enable-\($0)" })
+
+try? Process.run(pathConfigure, arguments: configureDisable.map { "--disable-\($0)" } + configureEnable.map { "--enable-\($0)" })
+
+if let pathCp = pathCp {
+    try? Process.run(pathCp, arguments: ["\(pathConfigSpm)", "\(pathConfigSite)"])
+}
+
+
+//
+//if let envPath = ProcessInfo.processInfo.environment["PATH"] {
+//    envPath.split(separator: ":").map { path in
+//        let maybeCp =
+//        if let cp = try? maybeCp.checkResourceIsReachable() {
+//            print(maybeCp.path)
+//        }
+//    }
+//}
+//exit(0)
+//pjlib/include/pj/config_site.h
+
+// Process.run(configure, arguments: configure_disable.map { "--disable-\($0)" } + configure_enable.map { "--enable-\($0)" })
+
 let packagePath = #file
 
 var pjproject_lib_prefixes = [ "pjmedia", "pjmedia-audiodev", "pjmedia-codec", "pjsdp", "pjmedia-videodev", "pjsip-simple", "pjsip", "pjsua", "pjsip-ua", "pj", "pjlib-util", "resample", "srtp", "yuv", "pjnath" ]

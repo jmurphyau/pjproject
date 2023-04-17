@@ -1,0 +1,10 @@
+#!/bin/sh
+
+mydir=$([[ -d $0 ]] && d=${0}/. || d=$0; ( cd -P "$( /usr/bin/dirname "$d" )" && pwd; ))
+
+( cd $mydir; ./aconfigure "$@" )
+
+# Note:
+# if you're looking for the old configure script, it has been renamed
+# to configure-legacy
+
