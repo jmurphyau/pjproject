@@ -72,7 +72,7 @@ ProcessInfo.processInfo.arguments.forEach { arg in
     print("arg \(arg)")
 }
  */
-let pjprojectDebug = ProcessInfo.processInfo.environment.keys.contains(where: { $0 == "PJPROJECT_DEBUG" }) ?? false
+let pjprojectDebug = ProcessInfo.processInfo.environment.keys.contains(where: { $0 == "PJPROJECT_DEBUG" })
 let pjprojectDebugLib = ProcessInfo.processInfo.environment["PJPROJECT_DEBUG_LIB"] ?? ""
 
 //
@@ -253,7 +253,7 @@ struct COptions : COptionsProtocolCSetting {
         
         let includesUrls: [URL?]? = self.includes?.map { (item: String) -> String in
             if item.starts(with: "/path/to/pjsip/pjproject/") {
-                var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
+                let repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
                 return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
             } else {
                 return item
@@ -285,7 +285,7 @@ struct CXXOptions : COptionsProtocolCXXSetting {
         
         let includesUrls: [URL?]? = self.includes?.map { (item: String) -> String in
             if item.starts(with: "/path/to/pjsip/pjproject/") {
-                var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
+                let repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
                 return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
             } else {
                 return item
