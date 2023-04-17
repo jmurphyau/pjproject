@@ -61,7 +61,7 @@ print(configureDisable.map { "--disable-\($0)" } + configureEnable.map { "--enab
 try? Process.run(pathConfigure, arguments: configureDisable.map { "--disable-\($0)" } + configureEnable.map { "--enable-\($0)" })
 
 if let pathCp = pathCp {
-    try? Process.run(pathCp, arguments: ["\(pathConfigSpm)", "\(pathConfigSite)"])
+    try? Process.run(pathCp, arguments: ["\(pathConfigSpm.standardizedFileURL.resolvingSymlinksInPath().path)", "\(pathConfigSite.standardizedFileURL.resolvingSymlinksInPath().path)"])
 }
 
 ProcessInfo.processInfo.environment.forEach { (k,v) in
@@ -320,12 +320,12 @@ struct MakePaths {
 }
 
 struct MakePackage {
-    let name: String
+    var name: String
     let paths: MakePaths
     let c: COptions
     let cxx: CXXOptions
     let ld: LibOptions
-    let objects: [String]
+    var objects: [String]
     var objectFileUrls: [URL] {
         self.objects.map { obj in
             URL(fileURLWithPath: obj, relativeTo: self.paths.sourceUrl)
@@ -627,7 +627,7 @@ let make_pjmedia = MakePackage(
     ),
     objects: ["alaw_ulaw.o", "alaw_ulaw_table.o", "avi_player.o", "bidirectional.o", "clock_thread.o", "codec.o", "conference.o", "conf_switch.o", "converter.o", "converter_libswscale.o", "converter_libyuv.o", "delaybuf.o", "echo_common.o", "echo_port.o", "echo_suppress.o", "echo_webrtc.o", "echo_webrtc_aec3.o", "endpoint.o", "errno.o", "event.o", "format.o", "ffmpeg_util.o", "g711.o", "jbuf.o", "master_port.o", "mem_capture.o", "mem_player.o", "null_port.o", "plc_common.o", "port.o", "splitcomb.o", "resample_resample.o", "resample_libsamplerate.o", "resample_speex.o", "resample_port.o", "rtcp.o", "rtcp_xr.o", "rtcp_fb.o", "rtp.o", "sdp.o", "sdp_cmp.o", "sdp_neg.o", "session.o", "silencedet.o", "sound_legacy.o", "sound_port.o", "stereo_port.o", "stream_common.o", "stream.o", "stream_info.o", "tonegen.o", "transport_adapter_sample.o", "transport_ice.o", "transport_loop.o", "transport_srtp.o", "transport_udp.o", "types.o", "vid_codec.o", "vid_codec_util.o", "vid_port.o", "vid_stream.o", "vid_stream_info.o", "vid_conf.o", "wav_player.o", "wav_playlist.o", "wav_writer.o", "wave.o", "wsola.o", "audiodev.o", "videodev.o"]
 )
-let make_pjmedia_videodev = MakePackage(
+var make_pjmedia_videodev = MakePackage(
     name: "pjmedia_videodev",
     paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia-videodev"),
     c: COptions(
@@ -658,6 +658,11 @@ let make_pjmedia_videodev = MakePackage(
     ),
     objects: ["darwin_dev.o", "sdl_dev_m.o", "videodev.o", "errno.o", "avi_dev.o", "ffmpeg_dev.o", "colorbar_dev.o", "v4l2_dev.o", "opengl_dev.o", "util.o"]
 )
+
+#if os(linux)
+make_pjmedia_videodev.objects = ["sdl_dev.o", "videodev.o", "errno.o", "avi_dev.o", "ffmpeg_dev.o", "colorbar_dev.o", "v4l2_dev.o", "opengl_dev.o", "util.o"]
+#endif
+
 let make_pjmedia_audiodev = MakePackage(
     name: "pjmedia_audiodev",
     paths: MakePaths(makefile: "pjmedia/build", source: "../src/pjmedia-audiodev"),
@@ -1106,13 +1111,13 @@ let package = Package(
         make_pjsip.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjsip_ua", "pjsip_simple"]),
         make_pjsip_simple.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util"]),
         make_pjsip_ua.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjmedia"]),
-        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "yuv", "resample"]),
-        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["yuv", "pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
+        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "resample"]),
+        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_audiodev.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_codec.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjlib"]),
         make_srtp.makeTarget(packagePath: "third_party", buildDir: "third_party/build/srtp", searchRoot: "third_party/srtp", publicHeadersPath: "srtp/include", dependencies: ["pjlib"]),
         make_resample.makeTarget(packagePath: "third_party", buildDir: "third_party/build/resample", searchRoot: "third_party", publicHeadersPath: "resample/include", dependencies: []),
-        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
+//        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
     ]
 )
 
