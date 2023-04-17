@@ -50,7 +50,7 @@ let configureDisable = [ "android-mediacodec", "bcg729", "ffmpeg", "g722-codec",
 let configureEnable = ["epoll", "kqueue"]
 
 let pathCp = ProcessInfo.processInfo.environment["PATH"]?.split(separator: ":").map { URL(fileURLWithPath: "cp", relativeTo: URL(fileURLWithPath: String($0))) }.filter { (try? $0.checkResourceIsReachable()) ?? false }.first
-
+/*
 print(pathCp?.absoluteURL.path)
 print(pathConfigSpm.absoluteURL.path)
 print(pathConfigSite.absoluteURL.path)
@@ -74,7 +74,7 @@ ProcessInfo.processInfo.arguments.forEach { arg in
 
 let pjprojectDebug = ProcessInfo.processInfo.environment.keys.contains(where: { $0 == "PJPROJECT_DEBUG" }) ?? false
 let pjprojectDebugLib = ProcessInfo.processInfo.environment["PJPROJECT_DEBUG_LIB"] ?? ""
-
+*/
 //
 //if let envPath = ProcessInfo.processInfo.environment["PATH"] {
 //    envPath.split(separator: ":").map { path in
