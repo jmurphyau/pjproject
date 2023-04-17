@@ -72,6 +72,9 @@ ProcessInfo.processInfo.arguments.forEach { arg in
     print("arg \(arg)")
 }
 
+let pjprojectDebug = ProcessInfo.processInfo.environment.keys.contains(where: { $0 == "PJPROJECT_DEBUG" }) ?? false
+let pjprojectDebugLib = ProcessInfo.processInfo.environment["PJPROJECT_DEBUG_LIB"] ?? ""
+
 //
 //if let envPath = ProcessInfo.processInfo.environment["PATH"] {
 //    envPath.split(separator: ":").map { path in
@@ -123,56 +126,56 @@ struct LibOptions {
     var libsSettings: [LinkerSetting] {
         self.libs?.map { (l) in LinkerSetting.linkedLibrary(l) } ?? []
     }
-    
+
     var libLocal: [String]? { self.libs?.filter { lib in !pjproject_lib_prefixes.filter { lib.starts(with: $0) }.isEmpty } }
     var libLocalSettings: [LinkerSetting] {
         self.libLocal?.map { (l) in LinkerSetting.linkedLibrary(l) } ?? []
     }
-    
+
     var libNonLocal: [String]? { self.libs?.filter { lib in pjproject_lib_prefixes.filter { lib.starts(with: $0) }.isEmpty } }
     var libNonLocalSettings: [LinkerSetting] {
         self.libNonLocal?.map { (l) in LinkerSetting.linkedLibrary(l) } ?? []
     }
-    
+
     let frameworks: [String]?
     var frameworksSettings: [LinkerSetting] { self.frameworks?.map { (l) in LinkerSetting.linkedFramework(l) } ?? [] }
-    
+
     let search: [String]?
     func searchSettings(fileRelativeTo: URL, resultRelativeTo: URL, packageRootUrl: URL) -> [LinkerSetting] {
-        
+
         let resultUrls = self.search?.map { item in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
-        
+
         if (resultUrls?.count ?? 0) > 0 {
             return [LinkerSetting.unsafeFlags(resultUrls!.filter { $0 != nil }.map{ $0! }.filter{ $0.fileIsRelativeOf(relativeTo: packageRootUrl) != true }.map { "-L\($0.resolvingSymlinksInPath().path)" })]
         }
         return []
     }
-    
+
     let others: [String]?
     var othersSettings: [LinkerSetting] { [LinkerSetting.unsafeFlags(self.others ?? [])] }
-    
-    
+
+
 }
 protocol CDefinesProtocol<DefinesSettingsType> {
     associatedtype DefinesSettingsType
     var noValue: [String]? { get set }
     var noValueSettings: [DefinesSettingsType] { get }
-    
+
     var asZero: [String]? { get set }
     var asZeroSettings: [DefinesSettingsType] { get }
-    
+
     var asOne: [String]? { get set }
     var asOneSettings: [DefinesSettingsType] { get }
-    
+
     var others: [(String, String)]? { get set }
     var othersSettings: [DefinesSettingsType] { get }
-    
+
     var settings: [DefinesSettingsType] { get }
-    
-    
+
+
 }
 
 extension CDefinesProtocol  {
@@ -181,11 +184,11 @@ extension CDefinesProtocol  {
     }
 }
 protocol CDefinesProtocolCSetting : CDefinesProtocol where DefinesSettingsType == CSetting {
-    
+
 }
 
 protocol CDefinesProtocolCXXSetting : CDefinesProtocol where DefinesSettingsType == CXXSetting {
-    
+
 }
 extension CDefinesProtocolCSetting {
     var noValueSettings: [DefinesSettingsType] { self.noValue?.map { (k) in DefinesSettingsType.define(k) } ?? [] }
@@ -218,16 +221,16 @@ struct CXXDefines : CDefinesProtocolCXXSetting {
 }
 
 protocol CSettingsOrCXXSettings {
-    
+
 }
 
 protocol COptionsProtocol {
     associatedtype SettingsType
     var definesSettings: [SettingsType] { get }
-    
+
     var includes: [String]? { get set }
-    func includesSettings(fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType]
-    
+    func includesSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType]
+
     var others: [String]? { get set }
     var othersSettings: [SettingsType] { get }
 }
@@ -241,26 +244,34 @@ protocol COptionsProtocolCXXSetting : COptionsProtocol where SettingsType == CXX
 
 struct COptions : COptionsProtocolCSetting {
     typealias SettingsType = CSetting
-    
+
     var defines: CDefines
     var definesSettings: [SettingsType] { defines.noValueSettings + defines.asZeroSettings + defines.asOneSettings + defines.othersSettings }
-    
+
     var includes: [String]?
-    func includesSettings(fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
+    func includesSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
+        
         let includesUrls = self.includes?.map { item in
+            if item.starts(with: "/path/to/pjsip/pjproject/") {
+                var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
+                return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
+            } else {
+                return item
+            }
+        }.map { item in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
         return (includesUrls ?? []).filter { $0 != nil }.map { SettingsType.headerSearchPath($0!.relativeString) }
     }
-    
+
     var others: [String]?
     var othersSettings: [SettingsType] { if (self.others != nil) { return [SettingsType.unsafeFlags(self.others!)] } else { return [] } }
-    
-    func cSettings(fileRelativeTo: URL, resultRelativeTo: URL) -> [CSetting] {
-        
-        
-        return self.definesSettings + self.includesSettings(fileRelativeTo: fileRelativeTo, resultRelativeTo: resultRelativeTo)
+
+    func cSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [CSetting] {
+
+
+        return self.definesSettings + self.includesSettings(repoRoot: repoRoot, fileRelativeTo: fileRelativeTo, resultRelativeTo: resultRelativeTo)
     }
 }
 
@@ -268,16 +279,23 @@ struct CXXOptions : COptionsProtocolCXXSetting {
     typealias SettingsType = CXXSetting
     var defines: CXXDefines
     var definesSettings: [SettingsType] { defines.noValueSettings + defines.asZeroSettings + defines.asOneSettings + defines.othersSettings }
-    
+
     var includes: [String]?
-    func includesSettings(fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
+    func includesSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
         let includesUrls = self.includes?.map { item in
+            if item.starts(with: "/path/to/pjsip/pjproject/") {
+                var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
+                return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
+            } else {
+                return item
+            }
+        }.map { item in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
         return (includesUrls ?? []).filter { $0 != nil }.map { SettingsType.headerSearchPath($0!.relativeString) }
     }
-    
+
     var others: [String]?
     var othersSettings: [SettingsType] { if (self.others != nil) { return [SettingsType.unsafeFlags(self.others!)] } else { return [] } }
 }
@@ -316,49 +334,65 @@ struct MakePackage {
         return self.objectFileUrls.map { $0.sourceFile() }
     }
     func cSettings(resultRelativeTo: URL) -> [CSetting] {
-        return self.c.definesSettings + self.c.includesSettings(fileRelativeTo: self.paths.makefileUrl, resultRelativeTo: resultRelativeTo)
+        return self.c.definesSettings + self.c.includesSettings(repoRoot: self.paths.packageRootUrl!, fileRelativeTo: self.paths.makefileUrl, resultRelativeTo: resultRelativeTo)
     }
     func cxxSettings(resultRelativeTo: URL) -> [CXXSetting] {
-        return self.cxx.definesSettings + self.cxx.includesSettings(fileRelativeTo: self.paths.makefileUrl, resultRelativeTo: resultRelativeTo)
+        return self.cxx.definesSettings + self.cxx.includesSettings(repoRoot: self.paths.packageRootUrl!, fileRelativeTo: self.paths.makefileUrl, resultRelativeTo: resultRelativeTo)
     }
     func linkerSettings(libsRelativeTo: URL, resultRelativeTo: URL, packageRootUrl: URL) -> [LinkerSetting] {
         // return self.ld.libNonLocalSettings + self.ld.frameworksSettings + self.ld.othersSettings + self.ld.searchSettings(fileRelativeTo: libsRelativeTo, resultRelativeTo: resultRelativeTo, packageRootUrl: packageRootUrl)
         return self.ld.libNonLocalSettings + self.ld.frameworksSettings + self.ld.othersSettings
     }
-    
+
     func makeTarget(packagePath: String, buildDir: String, searchRoot: String, publicHeadersPath: String?, dependencies: [Target.Dependency] = [], extraCSettings: [CSetting] = [], extraCxxSettings: [CXXSetting] = [], extraLinkerSettings: [LinkerSetting] = []) -> Target {
         let buildDirUrl = URL(fileURLWithPath: buildDir, relativeTo: paths.packageRootUrl)
         let searchRootUrl = URL(fileURLWithPath: searchRoot, relativeTo: paths.packageRootUrl)
         let packagePathUrl = URL(fileURLWithPath: packagePath, relativeTo: paths.packageRootUrl)
-        
+
         let cSettings = self.cSettings(resultRelativeTo: packagePathUrl)+extraCSettings
         let cxxSettings = self.cxxSettings(resultRelativeTo: packagePathUrl)+extraCxxSettings
 
         let sources = self.sourceFileUrls.filter { $0 != nil }.map { $0!.fileUrlRelativeTo(relativeTo: packagePathUrl)!.relativeString }
-        
+
         let linkerSettings = self.linkerSettings(libsRelativeTo: searchRootUrl, resultRelativeTo: packagePathUrl, packageRootUrl: paths.packageRootUrl!)+extraLinkerSettings
-        
+
         var excludes: [String] = []
         if packagePath == "." {
             excludes = [ "pjsip-apps" ]
         }
-        
-        /*
-        print("!! \(name) c.includes:")
-        c.includes?.forEach { print($0) }
-        
-        print("!! \(name) cSettings:")
-        cSettings.forEach { print($0) }
-        
-        print("!! \(name) cxxSettings:")
-        cxxSettings.forEach { print($0) }
-        
-        print("!! \(name) sources:")
-        sources.forEach { print($0) }
-        
-        print("!! \(name) linkerSettings:")
-        linkerSettings.forEach { print($0) }
-        */
+
+        if pjprojectDebug {
+            if pjprojectDebugLib.isEmpty || pjprojectDebugLib == name {
+                print("!! \(name) buildDirUrl: \(buildDirUrl)")
+                print("!! \(name) buildDirUrl resolved: \(buildDirUrl.resolvingSymlinksInPath().absoluteURL.path)")
+                print("!! \(name) searchRootUrl: \(searchRootUrl)")
+                print("!! \(name) searchRootUrl resolved: \(searchRootUrl.resolvingSymlinksInPath().absoluteURL.path)")
+                print("!! \(name) packagePathUrl: \(packagePathUrl)")
+                print("!! \(name) packagePathUrl resolved: \(packagePathUrl.resolvingSymlinksInPath().absoluteURL.path)")
+                print("!! \(name) makefileUrl: \(self.paths.makefileUrl)")
+                print("!! \(name) makefileUrl resolved: \(self.paths.makefileUrl.resolvingSymlinksInPath().absoluteURL.path)")
+
+                print("!! \(name) includesSettings:")
+                self.c.includesSettings(repoRoot: self.paths.packageRootUrl!, fileRelativeTo: self.paths.makefileUrl, resultRelativeTo: packagePathUrl.absoluteURL).forEach { print($0) }
+
+                print("!! \(name) c.includes:")
+                c.includes?.forEach { print($0) }
+
+                print("!! \(name) cSettings:")
+                cSettings.forEach { print($0) }
+
+                print("!! \(name) cxxSettings:")
+                cxxSettings.forEach { print($0) }
+
+                print("!! \(name) sources:")
+                sources.forEach { print($0) }
+
+                print("!! \(name) linkerSettings:")
+                linkerSettings.forEach { print($0) }
+            }
+        }
+
+
         return Target.target(
             name: self.name,
             dependencies: dependencies,
@@ -571,7 +605,7 @@ let make_pjmedia = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     cxx: CXXOptions(
@@ -581,7 +615,7 @@ let make_pjmedia = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     ld: LibOptions(
@@ -602,7 +636,7 @@ let make_pjmedia_videodev = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     cxx: CXXOptions(
@@ -612,7 +646,7 @@ let make_pjmedia_videodev = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     ld: LibOptions(
@@ -633,7 +667,7 @@ let make_pjmedia_audiodev = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     cxx: CXXOptions(
@@ -643,7 +677,7 @@ let make_pjmedia_audiodev = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     ld: LibOptions(
@@ -664,7 +698,7 @@ let make_pjmedia_codec = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     cxx: CXXOptions(
@@ -674,7 +708,7 @@ let make_pjmedia_codec = MakePackage(
             asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
-        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/build/srtp", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/crypto/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/srtp/include", "/Users/jmurphy/GitHub/pjsip/pjproject-clone10/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
+        includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
         others: ["-Wall", "-fPIC"]
     ),
     ld: LibOptions(
@@ -847,7 +881,7 @@ let make_yuv = MakePackage(
 let target_pjproject: Target = Target.target(
     name: "pjproject",
     path: ".",
-    
+
     sources: [
         "pjlib/src/pj/ioqueue_kqueue.c",
         "pjlib/src/pj/file_access_unistd.c",
@@ -937,7 +971,7 @@ let target_pjproject: Target = Target.target(
 let target_pjlib2: Target = Target.target(
     name: "pjlib",
     path: "pjlib",
-    
+
     sources: [
         "src/pj/ioqueue_kqueue.c",
         "src/pj/file_access_unistd.c",
@@ -1002,7 +1036,7 @@ let target_pjlib2: Target = Target.target(
 let target_pjlib_util2: Target = Target.target(
     name: "pjlib_util",
     path: "pjlib-util",
-    
+
     sources: [
         "src/pjlib-util/base64.c",
         "src/pjlib-util/cli.c",
