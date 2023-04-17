@@ -251,14 +251,14 @@ struct COptions : COptionsProtocolCSetting {
     var includes: [String]?
     func includesSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
         
-        let includesUrls = self.includes?.map { item in
+        let includesUrls: [URL?]? = self.includes?.map { (item: String) -> String in
             if item.starts(with: "/path/to/pjsip/pjproject/") {
                 var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
                 return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
             } else {
                 return item
             }
-        }.map { item in
+        }.map { (item: String) -> URL? in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
@@ -282,14 +282,15 @@ struct CXXOptions : COptionsProtocolCXXSetting {
 
     var includes: [String]?
     func includesSettings(repoRoot: URL, fileRelativeTo: URL, resultRelativeTo: URL) -> [SettingsType] {
-        let includesUrls = self.includes?.map { item in
+        
+        let includesUrls: [URL?]? = self.includes?.map { (item: String) -> String in
             if item.starts(with: "/path/to/pjsip/pjproject/") {
                 var repoRootString = repoRoot.standardizedFileURL.resolvingSymlinksInPath().absoluteURL.path
                 return "\(repoRootString)/\(item[item.index(item.startIndex, offsetBy: 25)...])"
             } else {
                 return item
             }
-        }.map { item in
+        }.map { (item: String) -> URL? in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
