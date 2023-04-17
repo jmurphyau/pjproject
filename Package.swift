@@ -143,7 +143,7 @@ struct LibOptions {
     let search: [String]?
     func searchSettings(fileRelativeTo: URL, resultRelativeTo: URL, packageRootUrl: URL) -> [LinkerSetting] {
 
-        let resultUrls = self.search?.map { item in
+        let resultUrls: [URL?]? = self.search?.map { (item: String) -> URL? in
             let itemUrl = URL(fileURLWithPath: item, isDirectory: true, relativeTo: fileRelativeTo)
             return itemUrl.fileUrlRelativeTo(relativeTo: resultRelativeTo)
         }
@@ -159,7 +159,7 @@ struct LibOptions {
 
 
 }
-protocol CDefinesProtocol<DefinesSettingsType> {
+protocol CDefinesProtocol {
     associatedtype DefinesSettingsType
     var noValue: [String]? { get set }
     var noValueSettings: [DefinesSettingsType] { get }
