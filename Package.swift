@@ -64,6 +64,13 @@ if let pathCp = pathCp {
     try? Process.run(pathCp, arguments: ["\(pathConfigSpm)", "\(pathConfigSite)"])
 }
 
+ProcessInfo.processInfo.environment.forEach { (k,v) in
+    print("env \(k) = \(v)")
+}
+
+ProcessInfo.processInfo.arguments.forEach { arg in
+    print("arg \(arg)")
+}
 
 //
 //if let envPath = ProcessInfo.processInfo.environment["PATH"] {
