@@ -14,8 +14,8 @@
 // audio settings
 #define PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO     0
 #define PJMEDIA_AUDIO_DEV_HAS_WMME          0
-#define PJMEDIA_AUDIO_DEV_HAS_COREAUDIO     1
-#define PJMEDIA_VIDEO_DEV_HAS_DARWIN       1
+//#define PJMEDIA_AUDIO_DEV_HAS_COREAUDIO     1
+//#define PJMEDIA_VIDEO_DEV_HAS_DARWIN       1
 
 // video settings
 #define PJMEDIA_HAS_VIDEO 1
