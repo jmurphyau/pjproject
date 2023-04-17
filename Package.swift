@@ -898,13 +898,13 @@ let package = Package(
         make_pjsip.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjsip_ua", "pjsip_simple"]),
         make_pjsip_simple.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util"]),
         make_pjsip_ua.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjmedia"]),
-        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "resample"]),
-        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
+        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "resample", "yuv"]),
+        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjmedia", "yuv"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_audiodev.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_codec.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjlib"]),
         make_srtp.makeTarget(packagePath: "third_party", buildDir: "third_party/build/srtp", searchRoot: "third_party/srtp", publicHeadersPath: "srtp/include", dependencies: ["pjlib"]),
         make_resample.makeTarget(packagePath: "third_party", buildDir: "third_party/build/resample", searchRoot: "third_party", publicHeadersPath: "resample/include", dependencies: []),
-//        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
+        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
     ]
 )
 #elseif os(macOS)
@@ -1606,13 +1606,13 @@ let package = Package(
         make_pjsip.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjsip_ua", "pjsip_simple"]),
         make_pjsip_simple.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util"]),
         make_pjsip_ua.makeTarget(packagePath: "pjsip", buildDir: "pjsip/build", searchRoot: "pjsip", publicHeadersPath: "include", dependencies: ["pjlib", "pjlib_util", "pjmedia"]),
-        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "resample"]),
-        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
+        make_pjmedia.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjlib", "pjlib_util", "srtp", "pjnath", "resample", "yuv"]),
+        make_pjmedia_videodev.makeTarget(packagePath: ".", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "pjmedia/include", dependencies: ["pjmedia", "yuv"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_audiodev.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjmedia"], extraCSettings: [.unsafeFlags(["-fno-objc-arc"])]),
         make_pjmedia_codec.makeTarget(packagePath: "pjmedia", buildDir: "pjmedia/build", searchRoot: "pjmedia", publicHeadersPath: "include", dependencies: ["pjlib"]),
         make_srtp.makeTarget(packagePath: "third_party", buildDir: "third_party/build/srtp", searchRoot: "third_party/srtp", publicHeadersPath: "srtp/include", dependencies: ["pjlib"]),
         make_resample.makeTarget(packagePath: "third_party", buildDir: "third_party/build/resample", searchRoot: "third_party", publicHeadersPath: "resample/include", dependencies: []),
-//        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
+        make_yuv.makeTarget(packagePath: "third_party", buildDir: "third_party/build/yuv", searchRoot: "third_party", publicHeadersPath: "yuv/include", dependencies: []),
     ]
 )
 
