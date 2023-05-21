@@ -493,7 +493,7 @@ static pj_status_t oh264_codec_open(pjmedia_vid_codec *codec,
     /* Init encoder parameters */
     oh264_data->enc->GetDefaultParams (&eprm);
     eprm.iComplexityMode                = MEDIUM_COMPLEXITY;
-    eprm.sSpatialLayers[0].uiProfileIdc = PRO_BASELINE;
+    eprm.sSpatialLayers[0].uiProfileIdc = PRO_MAIN;
     eprm.iPicWidth                      = param->enc_fmt.det.vid.size.w;
     eprm.iUsageType                     = CAMERA_VIDEO_REAL_TIME;
     eprm.iPicHeight                     = param->enc_fmt.det.vid.size.h;
@@ -510,6 +510,7 @@ static pj_status_t oh264_codec_open(pjmedia_vid_codec *codec,
     eprm.iLoopFilterBetaOffset          = 0;
     eprm.iMultipleThreadIdc             = 1;
     //eprm.bEnableRc                    = 1;
+    eprm.iMaxBitrate                    = param->enc_fmt.det.vid.max_bps;
     eprm.iTargetBitrate                 = param->enc_fmt.det.vid.avg_bps;
     eprm.bEnableFrameSkip               = 1;
     eprm.bEnableDenoise                 = 0;
@@ -546,6 +547,7 @@ static pj_status_t oh264_codec_open(pjmedia_vid_codec *codec,
     elayer->iVideoHeight                = eprm.iPicHeight;
     elayer->fFrameRate                  = eprm.fMaxFrameRate;
     elayer->uiProfileIdc                = eprm.sSpatialLayers[0].uiProfileIdc;
+    elayer->iMaxSpatialBitrate          = eprm.iMaxBitrate;
     elayer->iSpatialBitrate             = eprm.iTargetBitrate;
     elayer->iDLayerQp                   = elayer_ctx.iDLayerQp;
     elayer->sSliceArgument.uiSliceMode = elayer_ctx.sSliceArgument.uiSliceMode;

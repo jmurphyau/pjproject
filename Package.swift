@@ -346,12 +346,23 @@ struct MakePackage {
     }
 
     func makeTarget(packagePath: String, buildDir: String, searchRoot: String, publicHeadersPath: String?, dependencies: [Target.Dependency] = [], extraCSettings: [CSetting] = [], extraCxxSettings: [CXXSetting] = [], extraLinkerSettings: [LinkerSetting] = []) -> Target {
+        let removeDebugCSettings: [CSetting] = [
+            .define("NDEBUG", .when(configuration: .release)),
+            .define("DEBUG", to: "0", .when(configuration: .release))
+        ]
+        let removeDebugCxxSettings: [CXXSetting] = [
+            .define("NDEBUG", .when(configuration: .release)),
+            .define("DEBUG", to: "0", .when(configuration: .release))
+        ]
+        
         let buildDirUrl = URL(fileURLWithPath: buildDir, relativeTo: paths.packageRootUrl)
         let searchRootUrl = URL(fileURLWithPath: searchRoot, relativeTo: paths.packageRootUrl)
         let packagePathUrl = URL(fileURLWithPath: packagePath, relativeTo: paths.packageRootUrl)
-
-        let cSettings = self.cSettings(resultRelativeTo: packagePathUrl)+extraCSettings
-        let cxxSettings = self.cxxSettings(resultRelativeTo: packagePathUrl)+extraCxxSettings
+        
+        
+        
+        let cSettings = self.cSettings(resultRelativeTo: packagePathUrl)+extraCSettings+removeDebugCSettings
+        let cxxSettings = self.cxxSettings(resultRelativeTo: packagePathUrl)+extraCxxSettings+removeDebugCxxSettings
 
         let sources = self.sourceFileUrls.filter { $0 != nil }.map { $0!.fileUrlRelativeTo(relativeTo: packagePathUrl)!.relativeString }
 
