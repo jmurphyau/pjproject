@@ -49,6 +49,7 @@
 #   define PJ_OS_HAS_CHECK_STACK        0
 #   undef PJ_IOQUEUE_MAX_HANDLES
 #   define PJ_IOQUEUE_MAX_HANDLES       10240
+#   define FD_SETSIZE                   PJ_IOQUEUE_MAX_HANDLES
 // #   define PJ_IOQUEUE_MAX_HANDLES       1152
 // #   define PJSIP_MAX_TSX_COUNT          ((640*1024)-1)
 // #   define PJSIP_MAX_DIALOG_COUNT       ((640*1024)-1)
