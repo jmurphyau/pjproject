@@ -29,7 +29,7 @@
 
 #define THIS_FILE               "h264_packetizer.c"
 
-#define DBG_PACKETIZE           0
+#define DBG_PACKETIZE           1
 #define DBG_UNPACKETIZE         0
 
 

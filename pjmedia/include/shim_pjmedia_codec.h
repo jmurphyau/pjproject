@@ -22,3 +22,4 @@
 #include "pjmedia-codec/speex.h"
 #include "pjmedia-codec/vid_toolbox.h"
 #include "pjmedia-codec/vpx.h"
+#include "pjmedia-codec/h264_packetizer.h"

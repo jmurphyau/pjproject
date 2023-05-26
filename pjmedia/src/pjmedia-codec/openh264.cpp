@@ -493,7 +493,7 @@ static pj_status_t oh264_codec_open(pjmedia_vid_codec *codec,
     /* Init encoder parameters */
     oh264_data->enc->GetDefaultParams (&eprm);
     eprm.iComplexityMode                = MEDIUM_COMPLEXITY;
-    eprm.sSpatialLayers[0].uiProfileIdc = PRO_MAIN;
+    eprm.sSpatialLayers[0].uiProfileIdc = PRO_HIGH;
     eprm.iPicWidth                      = param->enc_fmt.det.vid.size.w;
     eprm.iUsageType                     = CAMERA_VIDEO_REAL_TIME;
     eprm.iPicHeight                     = param->enc_fmt.det.vid.size.h;
@@ -815,7 +815,7 @@ static pj_status_t oh264_codec_encode_more(pjmedia_vid_codec *codec,
 
     oh264_data->enc_frame_whole = pLayerBsInfo->pBsBuf;
     oh264_data->enc_processed = 0;
-
+    PJ_LOG(3, (THIS_FILE, "oh264_data->enc_frame_size: %d", oh264_data->enc_frame_size));
 
     status = pjmedia_h264_packetize(oh264_data->pktz,
                                     oh264_data->enc_frame_whole,
