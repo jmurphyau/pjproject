@@ -815,7 +815,7 @@ static pj_status_t oh264_codec_encode_more(pjmedia_vid_codec *codec,
 
     oh264_data->enc_frame_whole = pLayerBsInfo->pBsBuf;
     oh264_data->enc_processed = 0;
-    PJ_LOG(3, (THIS_FILE, "oh264_data->enc_frame_size: %d", oh264_data->enc_frame_size));
+    //PJ_LOG(3, (THIS_FILE, "oh264_data->enc_frame_size: %d", oh264_data->enc_frame_size));
 
     status = pjmedia_h264_packetize(oh264_data->pktz,
                                     oh264_data->enc_frame_whole,

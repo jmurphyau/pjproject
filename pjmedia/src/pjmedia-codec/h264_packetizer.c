@@ -29,7 +29,7 @@
 
 #define THIS_FILE               "h264_packetizer.c"
 
-#define DBG_PACKETIZE           1
+#define DBG_PACKETIZE           0
 #define DBG_UNPACKETIZE         0
 
 
@@ -136,6 +136,7 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
     };
     enum { MAX_NALS_IN_AGGR = 32 };
 
+    
 #if DBG_PACKETIZE
     if (*pos == 0 && buf_len) {
         PJ_LOG(3, ("h264pack", "<< Start packing new frame >>"));
@@ -165,6 +166,18 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
     if (!nal_end)
         nal_end = p;
 
+#if DBG_PACKETIZE
+    
+    PJ_LOG(3, ("h264pack", "------"));
+    PJ_LOG(3, ("h264pack", "pos: %u", *pos));
+    PJ_LOG(3, ("h264pack", "buf_len: %zu", buf_len));
+    PJ_LOG(3, ("h264pack", "payload_len: %zu", *payload_len));
+    PJ_LOG(3, ("h264pack", "nal_start: %ld", nal_start-buf));
+    PJ_LOG(3, ("h264pack", "nal_end: %ld", nal_end-buf));
+    PJ_LOG(3, ("h264pack", "nal_len: %ld", (nal_end-buf)-(nal_start-buf)));
+    
+#endif
+    
     /* Validate MTU vs NAL length on single NAL unit packetization */
     if ((pktz->cfg.mode==PJMEDIA_H264_PACKETIZER_MODE_SINGLE_NAL) &&
         nal_end - nal_start > pktz->cfg.mtu)
@@ -221,6 +234,9 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
         *pos = (unsigned)(*payload + *payload_len - buf);
 
 #if DBG_PACKETIZE
+        PJ_LOG(3, ("h264pack", "pos: %u", *pos));
+        PJ_LOG(3, ("h264pack", "buf_len: %zu", buf_len));
+        PJ_LOG(3, ("h264pack", "payload_len: %zu", *payload_len));
         PJ_LOG(3, ("h264pack", "Packetized fragmented H264 NAL unit "
                    "(pos=%d, type=%d, NRI=%d, S=%d, E=%d, len=%d/%d)",
                    *payload-buf, TYPE, NRI, *p>>7, (*p>>6)&1, *payload_len,
@@ -313,6 +329,10 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
             *pos = (unsigned)(nal[nal_cnt-1] + nal_size[nal_cnt-1] - buf);
 
 #if DBG_PACKETIZE
+            PJ_LOG(3, ("h264pack", "pos: %u", *pos));
+            PJ_LOG(3, ("h264pack", "buf_len: %zu", buf_len));
+            PJ_LOG(3, ("h264pack", "payload_len: %zu", *payload_len));
+            
             PJ_LOG(3, ("h264pack", "Packetized aggregation of "
                        "%d H264 NAL units (pos=%d, NRI=%d len=%d/%d)",
                        nal_cnt, *payload-buf, NRI, *payload_len, buf_len));
@@ -328,6 +348,10 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
     *pos = (unsigned)(nal_end - buf);
 
 #if DBG_PACKETIZE
+    PJ_LOG(3, ("h264pack", "pos: %u", *pos));
+    PJ_LOG(3, ("h264pack", "buf_len: %zu", buf_len));
+    PJ_LOG(3, ("h264pack", "payload_len: %zu", *payload_len));
+    
     PJ_LOG(3, ("h264pack", "Packetized single H264 NAL unit "
                "(pos=%d, type=%d, NRI=%d, len=%d/%d)",
                nal_start-buf, *nal_octet&0x1F, (*nal_octet&0x60)>>5,
@@ -345,68 +369,65 @@ PJ_DEF(pj_status_t) pjmedia_h264_packetize(pjmedia_h264_packetizer *pktz,
  * state for the FU-A/B packets.
  */
 PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
-                                             const pj_uint8_t *payload,
-                                             pj_size_t   payload_len,
-                                             pj_uint8_t *bits,
-                                             pj_size_t   bits_len,
-                                             unsigned   *bits_pos)
+                                             const pj_uint8_t *packet_buf,
+                                             pj_size_t   packet_buf_size,
+                                             pj_uint8_t *result_buf,
+                                             pj_size_t   result_buf_size,
+                                             unsigned   *whole_len)
 {
     const pj_uint8_t nal_start[4] = {0, 0, 0, 1};
     const pj_uint8_t *nal_start_code; 
     enum { MIN_PAYLOAD_SIZE = 2 };
-    pj_uint8_t nal_type;
+    pj_uint8_t packet_nal_type;
 
-    nal_start_code = nal_start + PJ_ARRAY_SIZE(nal_start) -
-                     pktz->cfg.unpack_nal_start;
+    nal_start_code = nal_start + PJ_ARRAY_SIZE(nal_start) - pktz->cfg.unpack_nal_start;
 
 #if DBG_UNPACKETIZE
-    if (*bits_pos == 0 && payload_len) {
+    if (*whole_len == 0 && payload_len) {
         PJ_LOG(3, ("h264unpack", ">> Start unpacking new frame <<"));
     }
 #endif
 
     /* Check if this is a missing/lost packet */
-    if (payload == NULL) {
+    if (packet_buf == NULL) {
         pktz->unpack_prev_lost = PJ_TRUE;
         return PJ_SUCCESS;
     }
 
     /* H264 payload size */
-    if (payload_len < MIN_PAYLOAD_SIZE) {
+    if (packet_buf_size < MIN_PAYLOAD_SIZE) {
         /* Invalid bitstream, discard this payload */
         pktz->unpack_prev_lost = PJ_TRUE;
         return PJ_EINVAL;
     }
 
     /* Reset last sync point for every new picture bitstream */
-    if (*bits_pos == 0)
+    if (*whole_len == 0)
         pktz->unpack_last_sync_pos = 0;
 
-    nal_type = *payload & 0x1F;
-    if (nal_type >= NAL_TYPE_SINGLE_NAL_MIN &&
-        nal_type <= NAL_TYPE_SINGLE_NAL_MAX)
-    {
+    packet_nal_type = *packet_buf & 0x1F;
+    if (packet_nal_type >= NAL_TYPE_SINGLE_NAL_MIN && packet_nal_type <= NAL_TYPE_SINGLE_NAL_MAX) {
         /* Single NAL unit packet */
-        pj_uint8_t *p = bits + *bits_pos;
+        pj_uint8_t *result_buf_current = result_buf + *whole_len;
 
         /* Validate bitstream length */
-        if (bits_len-*bits_pos < payload_len+pktz->cfg.unpack_nal_start) {
+        if (result_buf_size - *whole_len < packet_buf_size + pktz->cfg.unpack_nal_start) {
             /* Insufficient bistream buffer, discard this payload */
             pj_assert(!"Insufficient H.264 bitstream buffer");
             return PJ_ETOOSMALL;
         }
 
         /* Write NAL unit start code */
-        pj_memcpy(p, nal_start_code, pktz->cfg.unpack_nal_start);
-        p += pktz->cfg.unpack_nal_start;
+        pj_memcpy(result_buf_current, nal_start_code, pktz->cfg.unpack_nal_start);
+        result_buf_current += pktz->cfg.unpack_nal_start;
 
         /* Write NAL unit */
-        pj_memcpy(p, payload, payload_len);
-        p += payload_len;
+        pj_memcpy(result_buf_current, packet_buf, packet_buf_size);
+        result_buf_current += packet_buf_size;
 
         /* Update the bitstream writing offset */
-        *bits_pos = (unsigned)(p - bits);
-        pktz->unpack_last_sync_pos = *bits_pos;
+        *whole_len = (unsigned)(result_buf_current - result_buf);
+        pktz->unpack_last_sync_pos = *whole_len;
 
 #if DBG_UNPACKETIZE
         PJ_LOG(3, ("h264unpack", "Unpacked single H264 NAL unit "
@@ -415,7 +436,7 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
 #endif
 
     }
-    else if (nal_type == NAL_TYPE_STAP_A)
+    else if (packet_nal_type == NAL_TYPE_STAP_A)
     {
         /* Aggregation packet */
         pj_uint8_t *p, *p_end;
@@ -423,17 +444,17 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
         unsigned cnt = 0;
 
         /* Validate bitstream length */
-        if (bits_len - *bits_pos < payload_len + 32) {
+        if (result_buf_size - *whole_len < packet_buf_size + 32) {
             /* Insufficient bistream buffer, discard this payload */
             pj_assert(!"Insufficient H.264 bitstream buffer");
             return PJ_ETOOSMALL;
         }
 
         /* Fill bitstream */
-        p = bits + *bits_pos;
-        p_end = bits + bits_len;
-        q = payload + 1;
-        q_end = payload + payload_len;
+        p = result_buf + *whole_len;
+        p_end = result_buf + result_buf_size;
+        q = packet_buf + 1;
+        q_end = packet_buf + packet_buf_size;
         while (q < q_end && p < p_end) {
             pj_uint16_t tmp_nal_size;
 
@@ -459,8 +480,8 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
             ++cnt;
 
             /* Update the bitstream writing offset */
-            *bits_pos = (unsigned)(p - bits);
-            pktz->unpack_last_sync_pos = *bits_pos;
+            *whole_len = (unsigned)(p - result_buf);
+            pktz->unpack_last_sync_pos = *whole_len;
         }
 
 #if DBG_UNPACKETIZE
@@ -471,17 +492,17 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
 #endif
 
     }
-    else if (nal_type == NAL_TYPE_FU_A)
+    else if (packet_nal_type == NAL_TYPE_FU_A)
     {
         /* Fragmentation packet */
         pj_uint8_t *p;
-        const pj_uint8_t *q = payload;
+        const pj_uint8_t *q = packet_buf;
         pj_uint8_t NRI, TYPE, S, E;
 
-        p = bits + *bits_pos;
+        p = result_buf + *whole_len;
 
         /* Validate bitstream length */
-        if (bits_len-*bits_pos < payload_len+pktz->cfg.unpack_nal_start) {
+        if (result_buf_size-*whole_len < packet_buf_size+pktz->cfg.unpack_nal_start) {
             /* Insufficient bistream buffer, drop this packet */
             pj_assert(!"Insufficient H.264 bitstream buffer");
             pktz->unpack_prev_lost = PJ_TRUE;
@@ -506,8 +527,8 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
             /* If prev packet was lost, revert the bitstream pointer to
              * the last sync point.
              */
-            pj_assert(pktz->unpack_last_sync_pos <= *bits_pos);
-            *bits_pos = pktz->unpack_last_sync_pos;
+            pj_assert(pktz->unpack_last_sync_pos <= *whole_len);
+            *whole_len = pktz->unpack_last_sync_pos;
             /* And discard this payload (and the following fragmentation
              * payloads carrying this same NAL unit.
              */
@@ -516,14 +537,14 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
         q += 2;
 
         /* Write NAL unit */
-        pj_memcpy(p, q, payload_len - 2);
-        p += (payload_len - 2);
+        pj_memcpy(p, q, packet_buf_size - 2);
+        p += (packet_buf_size - 2);
 
         /* Update the bitstream writing offset */
-        *bits_pos = (unsigned)(p - bits);
+        *whole_len = (unsigned)(p - result_buf);
         if (E) {
             /* Update the sync pos only if the end bit flag is set */
-            pktz->unpack_last_sync_pos = *bits_pos;
+            pktz->unpack_last_sync_pos = *whole_len;
         }
 
 #if DBG_UNPACKETIZE
@@ -533,7 +554,7 @@ PJ_DEF(pj_status_t) pjmedia_h264_unpacketize(pjmedia_h264_packetizer *pktz,
 #endif
 
     } else {
-        *bits_pos = 0;
+        *whole_len = 0;
         return PJ_ENOTSUP;
     }
 
