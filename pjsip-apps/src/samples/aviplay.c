@@ -82,13 +82,12 @@ struct codec_fmt {
     pj_bool_t           need_conversion;
     /* If conversion is needed, dst_fmt indicates the destination format */
     pjmedia_format_id   dst_fmt;
-} codec_fmts[] = {{PJMEDIA_FORMAT_MJPEG, "mjpeg",
-                   PJ_TRUE , PJMEDIA_FORMAT_I420},
-                  {PJMEDIA_FORMAT_H263 , "h263" ,
-                   PJ_FALSE, 0},
-                  {PJMEDIA_FORMAT_MPEG4, "mp4v"}, 
-                  {PJMEDIA_FORMAT_H264 , "h264"}
-                 };
+} codec_fmts[] = {
+    {PJMEDIA_FORMAT_MJPEG, "mjpeg", PJ_TRUE , PJMEDIA_FORMAT_I420},
+    {PJMEDIA_FORMAT_H263 , "h263" , PJ_FALSE, 0},
+    {PJMEDIA_FORMAT_MPEG4, "mp4v"}, 
+    {PJMEDIA_FORMAT_H264 , "h264"}
+};
 
 typedef struct avi_port_t
 {

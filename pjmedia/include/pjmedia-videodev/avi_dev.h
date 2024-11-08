@@ -24,6 +24,7 @@
  */
 #include <pjmedia-videodev/videodev.h>
 #include <pjmedia/avi_stream.h>
+#include <pjmedia-codec.h>
 
 PJ_BEGIN_DECL
 
@@ -63,6 +64,48 @@ typedef struct pjmedia_avi_dev_param
     pjmedia_avi_streams *avi_streams;
 
 } pjmedia_avi_dev_param;
+
+
+typedef struct avi_dev_strm avi_dev_strm;
+
+/* avi_ device info */
+typedef struct avi_dev_info
+{
+    pjmedia_vid_dev_info         info;
+
+    pj_pool_t                   *pool;
+    pj_str_t                     fpath;
+    pj_str_t                     title;
+    pjmedia_avi_streams         *avi;
+    pjmedia_port                *vid;
+    avi_dev_strm                *strm;
+    pjmedia_vid_codec           *codec;
+    pj_uint8_t                  *enc_buf;
+    pj_size_t                    enc_buf_size;
+} avi_dev_info;
+
+/* avi_ factory */
+typedef struct avi_factory
+{
+    pjmedia_vid_dev_factory      base;
+    pj_pool_t                   *pool;
+    pj_pool_factory             *pf;
+
+    unsigned                     dev_count;
+    struct avi_dev_info         *dev_info;
+} avi_factory;
+
+/* Video stream. */
+typedef struct avi_dev_strm
+{
+    pjmedia_vid_dev_stream           base;          /**< Base stream        */
+    pjmedia_vid_dev_param            param;         /**< Settings           */
+    pj_pool_t                       *pool;          /**< Memory pool.       */
+    struct avi_dev_info             *adi;
+
+    pjmedia_vid_dev_cb               vid_cb;        /**< Stream callback.   */
+    void                            *user_data;     /**< Application data.  */
+} avi_dev_strm;
 
 
 /**

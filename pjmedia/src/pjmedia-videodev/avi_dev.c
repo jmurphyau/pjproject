@@ -35,44 +35,44 @@
 
 typedef struct avi_dev_strm avi_dev_strm;
 
-/* avi_ device info */
-struct avi_dev_info
-{
-    pjmedia_vid_dev_info         info;
+// /* avi_ device info */
+// struct avi_dev_info
+// {
+//     pjmedia_vid_dev_info         info;
 
-    pj_pool_t                   *pool;
-    pj_str_t                     fpath;
-    pj_str_t                     title;
-    pjmedia_avi_streams         *avi;
-    pjmedia_port                *vid;
-    avi_dev_strm                *strm;
-    pjmedia_vid_codec           *codec;
-    pj_uint8_t                  *enc_buf;
-    pj_size_t                    enc_buf_size;
-};
+//     pj_pool_t                   *pool;
+//     pj_str_t                     fpath;
+//     pj_str_t                     title;
+//     pjmedia_avi_streams         *avi;
+//     pjmedia_port                *vid;
+//     avi_dev_strm                *strm;
+//     pjmedia_vid_codec           *codec;
+//     pj_uint8_t                  *enc_buf;
+//     pj_size_t                    enc_buf_size;
+// };
 
-/* avi_ factory */
-struct avi_factory
-{
-    pjmedia_vid_dev_factory      base;
-    pj_pool_t                   *pool;
-    pj_pool_factory             *pf;
+// /* avi_ factory */
+// struct avi_factory
+// {
+//     pjmedia_vid_dev_factory      base;
+//     pj_pool_t                   *pool;
+//     pj_pool_factory             *pf;
 
-    unsigned                     dev_count;
-    struct avi_dev_info         *dev_info;
-};
+//     unsigned                     dev_count;
+//     struct avi_dev_info         *dev_info;
+// };
 
-/* Video stream. */
-struct avi_dev_strm
-{
-    pjmedia_vid_dev_stream           base;          /**< Base stream        */
-    pjmedia_vid_dev_param            param;         /**< Settings           */
-    pj_pool_t                       *pool;          /**< Memory pool.       */
-    struct avi_dev_info             *adi;
+// /* Video stream. */
+// struct avi_dev_strm
+// {
+//     pjmedia_vid_dev_stream           base;          /**< Base stream        */
+//     pjmedia_vid_dev_param            param;         /**< Settings           */
+//     pj_pool_t                       *pool;          /**< Memory pool.       */
+//     struct avi_dev_info             *adi;
 
-    pjmedia_vid_dev_cb               vid_cb;        /**< Stream callback.   */
-    void                            *user_data;     /**< Application data.  */
-};
+//     pjmedia_vid_dev_cb               vid_cb;        /**< Stream callback.   */
+//     void                            *user_data;     /**< Application data.  */
+// };
 
 
 /* Prototypes */
@@ -619,7 +619,6 @@ static pj_status_t avi_dev_strm_get_frame(pjmedia_vid_dev_stream *strm,
                                          pjmedia_frame *frame)
 {
     struct avi_dev_strm *stream = (struct avi_dev_strm*)strm;
-    
     if (stream->adi->codec) {
         pjmedia_frame enc_frame;
         pj_status_t status;

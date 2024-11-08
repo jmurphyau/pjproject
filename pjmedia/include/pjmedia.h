@@ -52,7 +52,7 @@
 #include <pjmedia/rtp.h>
 #include <pjmedia/sdp.h>
 #include <pjmedia/sdp_neg.h>
-//#include <pjmedia/session.h>
+#include <pjmedia/session.h>
 #include <pjmedia/silencedet.h>
 #include <pjmedia/sound.h>
 #include <pjmedia/sound_port.h>
@@ -71,7 +71,7 @@
 #include <pjmedia/vid_conf.h>
 #include <pjmedia/vid_port.h>
 #include <pjmedia/vid_stream.h>
-//#include <pjmedia/vid_tee.h>
+#include <pjmedia/vid_tee.h>
 #include <pjmedia/wav_playlist.h>
 #include <pjmedia/wav_port.h>
 #include <pjmedia/wave.h>

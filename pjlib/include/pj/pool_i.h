@@ -84,6 +84,7 @@ PJ_IDEF(pj_pool_t*) pj_pool_create( pj_pool_factory *f,
 {
     return (*f->create_pool)(f, name, initial_size, increment_size, callback);
 }
+ 
 
 PJ_IDEF(void) pj_pool_release( pj_pool_t *pool )
 {

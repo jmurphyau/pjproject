@@ -667,7 +667,7 @@ static pj_status_t oh264_codec_encode_begin(pjmedia_vid_codec *codec,
 
     oh264_data = (oh264_codec_data*) codec->codec_data;
 
-    PJ_ASSERT_RETURN(input->size == oh264_data->enc_input_size,
+    PJ_ASSERT_RETURN(input->size <= oh264_data->enc_input_size,
                      PJMEDIA_CODEC_EFRMINLEN);
 
     if (opt && opt->force_keyframe) {
@@ -1088,7 +1088,7 @@ static pj_status_t oh264_codec_decode(pjmedia_vid_codec *codec,
             oh264_data->last_missing_kf_event = 0;
         }
 
-        if (0 && sDstBufInfo.iBufferStatus == 1) {
+        if (sDstBufInfo.iBufferStatus == 1) {
             // Better to just get the frame later after all NALs are consumed
             // by the decoder, it should have the best quality and save some
             // CPU load.

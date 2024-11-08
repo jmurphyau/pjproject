@@ -147,7 +147,7 @@ static pj_status_t apply_packed_fmt(const pjmedia_video_format_info *fi,
     unsigned i;
     pj_size_t stride;
 
-    stride = (pj_size_t)((aparam->size.w*fi->bpp) >> 3);
+    stride =  (pj_size_t)((aparam->size.w*fi->bpp) >> 3);
 
     /* Calculate memsize */
     aparam->framebytes = stride * aparam->size.h;

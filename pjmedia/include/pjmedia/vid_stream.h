@@ -245,11 +245,142 @@ pjmedia_vid_stream_rc_config_default(pjmedia_vid_stream_rc_config *cfg);
 PJ_DECL(void)
 pjmedia_vid_stream_sk_config_default(pjmedia_vid_stream_sk_config *cfg);
 
+typedef struct pjmedia_vid_stream pjmedia_vid_stream;
+
+typedef struct pjmedia_vid_channel
+{
+    pjmedia_vid_stream     *stream;         /**< Parent stream.             */
+    pjmedia_dir             dir;            /**< Channel direction.         */
+    pjmedia_port            port;           /**< Port interface.            */
+    unsigned                pt;             /**< Payload type.              */
+    pj_bool_t               paused;         /**< Paused?.                   */
+    void                   *buf;            /**< Output buffer.             */
+    unsigned                buf_size;       /**< Size of output buffer.     */
+    pjmedia_rtp_session     rtp;            /**< RTP session.               */
+} pjmedia_vid_channel;
+
 
 /*
  * Opaque declaration for video stream.
  */
-typedef struct pjmedia_vid_stream pjmedia_vid_stream;
+typedef struct pjmedia_vid_stream
+{
+    pj_pool_t               *own_pool;      /**< Internal pool.             */
+    pjmedia_endpt           *endpt;         /**< Media endpoint.            */
+    pjmedia_vid_codec_mgr   *codec_mgr;     /**< Codec manager.             */
+    pjmedia_vid_stream_info  info;          /**< Stream info.               */
+    pj_grp_lock_t           *grp_lock;      /**< Stream lock.               */
+
+    pjmedia_vid_channel     *enc;           /**< Encoding channel.          */
+    pjmedia_vid_channel     *dec;           /**< Decoding channel.          */
+
+    pjmedia_dir              dir;           /**< Stream direction.          */
+    void                    *user_data;     /**< User data.                 */
+    pj_str_t                 name;          /**< Stream name                */
+    pj_str_t                 cname;         /**< SDES CNAME                 */
+
+    pjmedia_transport       *transport;     /**< Stream transport.          */
+
+    pjmedia_jbuf            *jb;            /**< Jitter buffer.             */
+    char                     jb_last_frm;   /**< Last frame type from jb    */
+    unsigned                 jb_last_frm_cnt;/**< Last JB frame type counter*/
+
+    pjmedia_rtcp_session     rtcp;          /**< RTCP for incoming RTP.     */
+    pj_timestamp             rtcp_last_tx;  /**< Last RTCP tx time.         */
+    pj_timestamp             rtcp_fb_last_tx;/**< Last RTCP-FB tx time.     */
+    pj_uint32_t              rtcp_interval; /**< Interval, in msec.         */
+    pj_bool_t                initial_rr;    /**< Initial RTCP RR sent       */
+    pj_bool_t                rtcp_sdes_bye_disabled;/**< Send RTCP SDES/BYE?*/
+    void                    *out_rtcp_pkt;  /**< Outgoing RTCP packet.      */
+    unsigned                 out_rtcp_pkt_size;
+                                            /**< Outgoing RTCP packet size. */
+
+    unsigned                 dec_max_size;  /**< Size of decoded/raw picture*/
+    pjmedia_ratio            dec_max_fps;   /**< Max fps of decoding dir.   */
+    pjmedia_frame            dec_frame;     /**< Current decoded frame.     */
+    unsigned                 dec_delay_cnt; /**< Decoding delay (in frames).*/
+    unsigned                 dec_max_delay; /**< Decoding max delay (in ts).*/
+    pjmedia_event            fmt_event;     /**< Buffered fmt_changed event
+                                                 to avoid deadlock          */
+    pjmedia_event            miss_keyframe_event;
+                                            /**< Buffered missing keyframe
+                                                 event for delayed republish*/
+
+    unsigned                 frame_size;    /**< Size of encoded base frame.*/
+    unsigned                 frame_ts_len;  /**< Frame length in timestamp. */
+
+    unsigned                 rx_frame_cnt;  /**< # of array in rx_frames    */
+    pjmedia_frame           *rx_frames;     /**< Temp. buffer for incoming
+                                                 frame assembly.            */
+    pj_bool_t                force_keyframe;/**< Forced to encode keyframe? */
+    unsigned                 num_keyframe;  /**< The number of keyframe needed
+                                                 to be sent, e.g: after the
+                                                 stream is created. */
+    pj_timestamp             last_keyframe_tx;
+                                            /**< Timestamp of the last
+                                                 keyframe. */
+
+
+#if defined(PJMEDIA_STREAM_ENABLE_KA) && PJMEDIA_STREAM_ENABLE_KA!=0
+    pj_bool_t                use_ka;           /**< Stream keep-alive with non-
+                                                    codec-VAD mechanism is
+                                                    enabled?                */
+    unsigned                 ka_interval;      /**< The keepalive sending
+                                                    interval                */
+    pj_time_val              last_frm_ts_sent; /**< Time of last sending
+                                                    packet                  */
+    unsigned                 start_ka_count;   /**< The number of keep-alive
+                                                    to be sent after it is
+                                                    created                 */
+    unsigned                 start_ka_interval;/**< The keepalive sending
+                                                    interval after the stream
+                                                    is created              */
+    pj_timestamp             last_start_ka_tx; /**< Timestamp of the last
+                                                    keepalive sent          */
+#endif
+
+#if TRACE_JB
+    pj_oshandle_t            trace_jb_fd;   /**< Jitter tracing file handle.*/
+    char                    *trace_jb_buf;  /**< Jitter tracing buffer.     */
+#endif
+
+    pjmedia_vid_codec       *codec;         /**< Codec instance being used. */
+    pj_uint32_t              last_dec_ts;   /**< Last decoded timestamp.    */
+    int                      last_dec_seq;  /**< Last decoded sequence.     */
+    pj_uint32_t              rtp_tx_err_cnt;/**< The number of RTP
+                                                 send() error               */
+    pj_uint32_t              rtcp_tx_err_cnt;/**< The number of RTCP
+                                                  send() error              */
+
+    pj_timestamp             ts_freq;       /**< Timestamp frequency.       */
+
+    pj_sockaddr              rem_rtp_addr;  /**< Remote RTP address         */
+    unsigned                 rem_rtp_flag;  /**< Indicator flag about
+                                                 packet from this addr.
+                                                 0=no pkt, 1=good ssrc pkts,
+                                                 2=bad ssrc pkts            */
+    pj_sockaddr              rtp_src_addr;  /**< Actual packet src addr.    */
+    unsigned                 rtp_src_cnt;   /**< How many pkt from this addr*/
+
+
+    /* RTCP Feedback */
+    pj_bool_t                send_rtcp_fb_nack;     /**< Send NACK?         */
+    int                      pending_rtcp_fb_nack;  /**< Any pending NACK?  */
+    int                      rtcp_fb_nack_cap_idx;  /**< RX NACK cap idx.   */
+    pjmedia_rtcp_fb_nack     rtcp_fb_nack;          /**< TX NACK state.     */
+
+    pj_bool_t                send_rtcp_fb_pli;      /**< Send PLI?          */
+    int                      pending_rtcp_fb_pli;   /**< Any pending PLI?   */
+    int                      rtcp_fb_pli_cap_idx;   /**< RX PLI cap idx.    */
+
+#if TRACE_RC
+    unsigned                 rc_total_sleep;
+    unsigned                 rc_total_pkt;
+    unsigned                 rc_total_img;
+    pj_timestamp             tx_start;
+    pj_timestamp             tx_end;
+#endif
+} pjmedia_vid_stream;
 
 
 /**

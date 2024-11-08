@@ -42,6 +42,7 @@
 
 #include "../pjmedia/ffmpeg_util.h"
 #include <libavcodec/avcodec.h>
+#include <libavutil/error.h>
 #include <libavformat/avformat.h>
 #if LIBAVCODEC_VER_AT_LEAST(53,20)
   /* Needed by 264 so far, on libavcodec 53.20 */

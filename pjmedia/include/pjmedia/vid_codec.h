@@ -425,6 +425,7 @@ PJ_DECL(pj_status_t) pjmedia_vid_codec_mgr_destroy(pjmedia_vid_codec_mgr *mgr);
  *
  * @return          The default codec manager instance or NULL if none.
  */
+__attribute__((swift_name("getter:defaultCodecManager()")))
 PJ_DECL(pjmedia_vid_codec_mgr*) pjmedia_vid_codec_mgr_instance(void);
 
 
@@ -433,6 +434,7 @@ PJ_DECL(pjmedia_vid_codec_mgr*) pjmedia_vid_codec_mgr_instance(void);
  *
  * @param mgr       The codec manager instance.
  */
+__attribute__((swift_name("setter:defaultCodecManager(_:)")))
 PJ_DECL(void) pjmedia_vid_codec_mgr_set_instance(pjmedia_vid_codec_mgr* mgr);
 
 

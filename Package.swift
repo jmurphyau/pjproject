@@ -46,8 +46,8 @@ let pathConfigure = URL(fileURLWithPath: "configure-spm", relativeTo: pathRoot)
 let pathConfigSpm = URL(fileURLWithPath: "pjlib/include/pj/config_spm.h", relativeTo: pathRoot)
 let pathConfigSite = URL(fileURLWithPath: "pjlib/include/pj/config_site.h", relativeTo: pathRoot)
 
-let configureDisable = [ "android-mediacodec", "bcg729", "ffmpeg", "g722-codec", "g7221-codec", "gsm-codec", "ilbc-codec", "l16-codec", "libwebrtc", "opencore-amr", "opus", "pjsua2", "silk", "speex-aec", "speex-codec", "upnp", "v4l2", "vpx" ]
-let configureEnable = ["epoll", "kqueue"]
+let configureDisable = [ "android-mediacodec", "bcg729", "ffmpeg", "g722-codec", "g7221-codec", "gsm-codec", "ilbc-codec", "l16-codec", "libwebrtc", "opencore-amr", "pjsua2", "silk", "speex-aec", "speex-codec", "upnp", "v4l2", "vpx" ]
+let configureEnable = ["epoll", "kqueue", "opus"]
 
 let pathCp = ProcessInfo.processInfo.environment["PATH"]?.split(separator: ":").map { URL(fileURLWithPath: "cp", relativeTo: URL(fileURLWithPath: String($0))) }.filter { (try? $0.checkResourceIsReachable()) ?? false }.first
 /*
@@ -614,7 +614,7 @@ let make_pjmedia = MakePackage(
         defines: CDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -624,7 +624,7 @@ let make_pjmedia = MakePackage(
         defines: CXXDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -645,7 +645,7 @@ let make_pjmedia_videodev = MakePackage(
         defines: CDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -655,7 +655,7 @@ let make_pjmedia_videodev = MakePackage(
         defines: CXXDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -676,7 +676,7 @@ let make_pjmedia_audiodev = MakePackage(
         defines: CDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -686,7 +686,7 @@ let make_pjmedia_audiodev = MakePackage(
         defines: CXXDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -707,7 +707,7 @@ let make_pjmedia_codec = MakePackage(
         defines: CDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -717,7 +717,7 @@ let make_pjmedia_codec = MakePackage(
         defines: CXXDefines(
             noValue: [],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_ALSA", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include"],
@@ -1113,7 +1113,7 @@ let make_pjmedia = MakePackage(
         defines: CDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1123,7 +1123,7 @@ let make_pjmedia = MakePackage(
         defines: CXXDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1135,7 +1135,7 @@ let make_pjmedia = MakePackage(
         search: ["../pjlib-util/lib", "../pjlib/lib", "../pjmedia/lib", "../pjnath/lib", "../pjsip/lib", "../third_party/lib", "/opt/homebrew/Cellar/gnutls/3.8.0/lib", "/opt/homebrew/lib"],
         others: []
     ),
-    objects: ["alaw_ulaw.o", "alaw_ulaw_table.o", "avi_player.o", "bidirectional.o", "clock_thread.o", "codec.o", "conference.o", "conf_switch.o", "converter.o", "converter_libswscale.o", "converter_libyuv.o", "delaybuf.o", "echo_common.o", "echo_port.o", "echo_suppress.o", "echo_webrtc.o", "echo_webrtc_aec3.o", "endpoint.o", "errno.o", "event.o", "format.o", "ffmpeg_util.o", "g711.o", "jbuf.o", "master_port.o", "mem_capture.o", "mem_player.o", "null_port.o", "plc_common.o", "port.o", "splitcomb.o", "resample_resample.o", "resample_libsamplerate.o", "resample_speex.o", "resample_port.o", "rtcp.o", "rtcp_xr.o", "rtcp_fb.o", "rtp.o", "sdp.o", "sdp_cmp.o", "sdp_neg.o", "session.o", "silencedet.o", "sound_legacy.o", "sound_port.o", "stereo_port.o", "stream_common.o", "stream.o", "stream_info.o", "tonegen.o", "transport_adapter_sample.o", "transport_ice.o", "transport_loop.o", "transport_srtp.o", "transport_udp.o", "types.o", "vid_codec.o", "vid_codec_util.o", "vid_port.o", "vid_stream.o", "vid_stream_info.o", "vid_conf.o", "wav_player.o", "wav_playlist.o", "wav_writer.o", "wave.o", "wsola.o", "audiodev.o", "videodev.o"]
+    objects: ["alaw_ulaw.o", "alaw_ulaw_table.o", "avi_player.o", "bidirectional.o", "clock_thread.o", "codec.o", "conference.o", "conf_switch.o", "converter.o", "converter_libswscale.o", "converter_libyuv.o", "delaybuf.o", "echo_common.o", "echo_port.o", "echo_suppress.o", "echo_webrtc.o", "echo_webrtc_aec3.o", "endpoint.o", "errno.o", "event.o", "format.o", "ffmpeg_util.o", "g711.o", "jbuf.o", "master_port.o", "mem_capture.o", "mem_player.o", "null_port.o", "plc_common.o", "port.o", "splitcomb.o", "resample_resample.o", "resample_libsamplerate.o", "resample_speex.o", "resample_port.o", "rtcp.o", "rtcp_xr.o", "rtcp_fb.o", "rtp.o", "sdp.o", "sdp_cmp.o", "sdp_neg.o", "session.o", "silencedet.o", "sound_legacy.o", "sound_port.o", "stereo_port.o", "stream_common.o", "stream.o", "stream_info.o", "tonegen.o", "transport_adapter_sample.o", "transport_ice.o", "transport_loop.o", "transport_srtp.o", "transport_udp.o", "types.o", "vid_codec.o", "vid_codec_util.o", "vid_port.o", "vid_stream.o", "vid_stream_info.o", "vid_conf.o", "wav_player.o", "wav_playlist.o", "wav_writer.o", "wave.o", "wsola.o", "audiodev.o", "videodev.o", "vid_tee.o"]
 )
 var make_pjmedia_videodev = MakePackage(
     name: "pjmedia_videodev",
@@ -1144,7 +1144,7 @@ var make_pjmedia_videodev = MakePackage(
         defines: CDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1154,7 +1154,7 @@ var make_pjmedia_videodev = MakePackage(
         defines: CXXDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1176,7 +1176,7 @@ let make_pjmedia_audiodev = MakePackage(
         defines: CDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1186,7 +1186,7 @@ let make_pjmedia_audiodev = MakePackage(
         defines: CXXDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1207,7 +1207,7 @@ let make_pjmedia_codec = MakePackage(
         defines: CDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],
@@ -1217,7 +1217,7 @@ let make_pjmedia_codec = MakePackage(
         defines: CXXDefines(
             noValue: ["_THREAD_SAFE"],
             asZero: ["PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO", "PJMEDIA_AUDIO_DEV_HAS_WMME", "PJMEDIA_HAS_ANDROID_MEDIACODEC", "PJMEDIA_HAS_G7221_CODEC", "PJMEDIA_HAS_G722_CODEC", "PJMEDIA_HAS_GSM_CODEC", "PJMEDIA_HAS_ILBC_CODEC", "PJMEDIA_HAS_L16_CODEC", "PJMEDIA_HAS_OPENCORE_AMRNB_CODEC", "PJMEDIA_HAS_OPENCORE_AMRWB_CODEC", "PJMEDIA_HAS_SPEEX_AEC", "PJMEDIA_HAS_SPEEX_CODEC", "PJMEDIA_HAS_WEBRTC_AEC", "PJMEDIA_HAS_WEBRTC_AEC3", "PJ_IS_BIG_ENDIAN"],
-            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
+            asOne: ["PJMEDIA_AUDIO_DEV_HAS_COREAUDIO", "PJMEDIA_HAS_LIBYUV", "PJMEDIA_HAS_OPENH264_CODEC", "PJMEDIA_HAS_OPUS_CODEC", "PJMEDIA_HAS_FFMPEG_VID_CODEC", "PJMEDIA_HAS_FFMPEG_CODEC_H264", "PJMEDIA_VIDEO_DEV_HAS_DARWIN", "PJMEDIA_VIDEO_DEV_HAS_SDL", "PJ_AUTOCONF", "PJ_IS_LITTLE_ENDIAN"],
             others: [("PJMEDIA_RESAMPLE_IMP", "PJMEDIA_RESAMPLE_LIBRESAMPLE")]
         ),
         includes: ["../..", "../../pjlib-util/include", "../../pjlib/include", "../../pjmedia/include", "../../pjnath/include", "../include", "/path/to/pjsip/pjproject/third_party/build/srtp", "/path/to/pjsip/pjproject/third_party/srtp/crypto/include", "/path/to/pjsip/pjproject/third_party/srtp/include", "/path/to/pjsip/pjproject/third_party/yuv/include", "/opt/homebrew/include/SDL2"],

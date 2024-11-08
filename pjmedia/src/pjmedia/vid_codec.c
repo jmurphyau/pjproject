@@ -165,13 +165,14 @@ PJ_DEF(pj_status_t) pjmedia_vid_codec_mgr_destroy (pjmedia_vid_codec_mgr *mgr)
     return PJ_SUCCESS;
 }
 
-
+__attribute__((swift_name("getter:defaultCodecManager()")))
 PJ_DEF(pjmedia_vid_codec_mgr*) pjmedia_vid_codec_mgr_instance(void)
 {
     //pj_assert(def_vid_codec_mgr);
     return def_vid_codec_mgr;
 }
 
+__attribute__((swift_name("setter:defaultCodecManager(_:)")))
 PJ_DEF(void) pjmedia_vid_codec_mgr_set_instance(pjmedia_vid_codec_mgr* mgr)
 {
     def_vid_codec_mgr = mgr;

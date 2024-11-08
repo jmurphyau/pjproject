@@ -578,7 +578,7 @@ on_error:
 PJ_DEF(void) pjsip_endpt_destroy(pjsip_endpoint *endpt)
 {
     pjsip_module *mod;
-    exit_cb *ecb;
+    pjsip_exit_cb *ecb;
 
     PJ_LOG(5, (THIS_FILE, "Destroying endpoint instance.."));
 
@@ -1349,11 +1349,11 @@ PJ_DEF(void) pjsip_endpt_dump( pjsip_endpoint *endpt, pj_bool_t detail )
 PJ_DEF(pj_status_t) pjsip_endpt_atexit( pjsip_endpoint *endpt,
                                         pjsip_endpt_exit_callback func)
 {
-    exit_cb *new_cb;
+    pjsip_exit_cb *new_cb;
 
     PJ_ASSERT_RETURN(endpt && func, PJ_EINVAL);
 
-    new_cb = PJ_POOL_ZALLOC_T(endpt->pool, exit_cb);
+    new_cb = PJ_POOL_ZALLOC_T(endpt->pool, pjsip_exit_cb);
     new_cb->func = func;
 
     pj_mutex_lock(endpt->mutex);

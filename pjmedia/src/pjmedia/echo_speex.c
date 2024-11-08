@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
  */
 
+#include <pjmedia/types.h>
 #include <pjmedia/echo.h>
 #include <pjmedia/errno.h>
 #include <pjmedia/frame.h>
