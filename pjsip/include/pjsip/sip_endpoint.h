@@ -65,62 +65,62 @@ PJ_BEGIN_DECL
 /**
  * Type of callback to register to pjsip_endpt_atexit().
  */
-// typedef pjsip_endpoint pjsip_endpoint;
+typedef pjsip_endpoint pjsip_endpoint;
 
 typedef void (*pjsip_endpt_exit_callback)(pjsip_endpoint *endpt);
 
-// typedef struct pjsip_exit_cb
-// {
-//     PJ_DECL_LIST_MEMBER             (struct pjsip_exit_cb);
-//     pjsip_endpt_exit_callback       func;
-// } pjsip_exit_cb;
-// typedef struct pjsip_endpoint
-// {
-//     /** Pool to allocate memory for the endpoint. */
-//     pj_pool_t           *pool;
+typedef struct pjsip_exit_cb
+{
+    PJ_DECL_LIST_MEMBER             (struct pjsip_exit_cb);
+    pjsip_endpt_exit_callback       func;
+} pjsip_exit_cb;
+typedef struct pjsip_endpoint
+{
+    /** Pool to allocate memory for the endpoint. */
+    pj_pool_t           *pool;
 
-//     /** Mutex for the pool, hash table, and event list/queue. */
-//     pj_mutex_t          *mutex;
+    /** Mutex for the pool, hash table, and event list/queue. */
+    pj_mutex_t          *mutex;
 
-//     /** Pool factory. */
-//     pj_pool_factory     *pf;
+    /** Pool factory. */
+    pj_pool_factory     *pf;
 
-//     /** Name. */
-//     pj_str_t             name;
+    /** Name. */
+    pj_str_t             name;
 
-//     /** Timer heap. */
-//     pj_timer_heap_t     *timer_heap;
+    /** Timer heap. */
+    pj_timer_heap_t     *timer_heap;
 
-//     /** Transport manager. */
-//     pjsip_tpmgr         *transport_mgr;
+    /** Transport manager. */
+    pjsip_tpmgr         *transport_mgr;
 
-//     /** Ioqueue. */
-//     pj_ioqueue_t        *ioqueue;
+    /** Ioqueue. */
+    pj_ioqueue_t        *ioqueue;
 
-//     /** Last ioqueue err */
-//     pj_status_t          ioq_last_err;
+    /** Last ioqueue err */
+    pj_status_t          ioq_last_err;
 
-//     /** DNS Resolver. */
-//     pjsip_resolver_t    *resolver;
+    /** DNS Resolver. */
+    pjsip_resolver_t    *resolver;
 
-//     /** Modules lock. */
-//     pj_rwmutex_t        *mod_mutex;
+    /** Modules lock. */
+    pj_rwmutex_t        *mod_mutex;
 
-//     /** Modules. */
-//     pjsip_module        *modules[PJSIP_MAX_MODULE];
+    /** Modules. */
+    pjsip_module        *modules[PJSIP_MAX_MODULE];
 
-//     /** Module list, sorted by priority. */
-//     pjsip_module         module_list;
+    /** Module list, sorted by priority. */
+    pjsip_module         module_list;
 
-//     /** Capability header list. */
-//     pjsip_hdr            cap_hdr;
+    /** Capability header list. */
+    pjsip_hdr            cap_hdr;
 
-//     /** Additional request headers. */
-//     pjsip_hdr            req_hdr;
+    /** Additional request headers. */
+    pjsip_hdr            req_hdr;
 
-//     /** List of exit callback. */
-//     pjsip_exit_cb              exit_cb_list;
-// } pjsip_endpoint;
+    /** List of exit callback. */
+    pjsip_exit_cb              exit_cb_list;
+} pjsip_endpoint;
 
 
 
