@@ -42,63 +42,63 @@
 
 
 /* List of SIP endpoint exit callback. */
-// typedef struct exit_cb
-// {
-//     PJ_DECL_LIST_MEMBER             (struct exit_cb);
-//     pjsip_endpt_exit_callback       func;
-// } exit_cb;
+typedef struct exit_cb
+{
+    PJ_DECL_LIST_MEMBER             (struct exit_cb);
+    pjsip_endpt_exit_callback       func;
+} exit_cb;
 
 
 /**
  * The SIP endpoint.
  */
-// struct pjsip_endpoint
-// {
-//     /** Pool to allocate memory for the endpoint. */
-//     pj_pool_t           *pool;
+struct pjsip_endpoint
+{
+    /** Pool to allocate memory for the endpoint. */
+    pj_pool_t           *pool;
 
-//     /** Mutex for the pool, hash table, and event list/queue. */
-//     pj_mutex_t          *mutex;
+    /** Mutex for the pool, hash table, and event list/queue. */
+    pj_mutex_t          *mutex;
 
-//     /** Pool factory. */
-//     pj_pool_factory     *pf;
+    /** Pool factory. */
+    pj_pool_factory     *pf;
 
-//     /** Name. */
-//     pj_str_t             name;
+    /** Name. */
+    pj_str_t             name;
 
-//     /** Timer heap. */
-//     pj_timer_heap_t     *timer_heap;
+    /** Timer heap. */
+    pj_timer_heap_t     *timer_heap;
 
-//     /** Transport manager. */
-//     pjsip_tpmgr         *transport_mgr;
+    /** Transport manager. */
+    pjsip_tpmgr         *transport_mgr;
 
-//     /** Ioqueue. */
-//     pj_ioqueue_t        *ioqueue;
+    /** Ioqueue. */
+    pj_ioqueue_t        *ioqueue;
 
-//     /** Last ioqueue err */
-//     pj_status_t          ioq_last_err;
+    /** Last ioqueue err */
+    pj_status_t          ioq_last_err;
 
-//     /** DNS Resolver. */
-//     pjsip_resolver_t    *resolver;
+    /** DNS Resolver. */
+    pjsip_resolver_t    *resolver;
 
-//     /** Modules lock. */
-//     pj_rwmutex_t        *mod_mutex;
+    /** Modules lock. */
+    pj_rwmutex_t        *mod_mutex;
 
-//     /** Modules. */
-//     pjsip_module        *modules[PJSIP_MAX_MODULE];
+    /** Modules. */
+    pjsip_module        *modules[PJSIP_MAX_MODULE];
 
-//     /** Module list, sorted by priority. */
-//     pjsip_module         module_list;
+    /** Module list, sorted by priority. */
+    pjsip_module         module_list;
 
-//     /** Capability header list. */
-//     pjsip_hdr            cap_hdr;
+    /** Capability header list. */
+    pjsip_hdr            cap_hdr;
 
-//     /** Additional request headers. */
-//     pjsip_hdr            req_hdr;
+    /** Additional request headers. */
+    pjsip_hdr            req_hdr;
 
-//     /** List of exit callback. */
-//     exit_cb              exit_cb_list;
-// };
+    /** List of exit callback. */
+    exit_cb              exit_cb_list;
+};
 
 
 #if defined(PJSIP_SAFE_MODULE) && PJSIP_SAFE_MODULE!=0
@@ -578,7 +578,7 @@ on_error:
 PJ_DEF(void) pjsip_endpt_destroy(pjsip_endpoint *endpt)
 {
     pjsip_module *mod;
-    pjsip_exit_cb *ecb;
+    exit_cb *ecb;
 
     PJ_LOG(5, (THIS_FILE, "Destroying endpoint instance.."));
 
@@ -1349,11 +1349,11 @@ PJ_DEF(void) pjsip_endpt_dump( pjsip_endpoint *endpt, pj_bool_t detail )
 PJ_DEF(pj_status_t) pjsip_endpt_atexit( pjsip_endpoint *endpt,
                                         pjsip_endpt_exit_callback func)
 {
-    pjsip_exit_cb *new_cb;
+    exit_cb *new_cb;
 
     PJ_ASSERT_RETURN(endpt && func, PJ_EINVAL);
 
-    new_cb = PJ_POOL_ZALLOC_T(endpt->pool, pjsip_exit_cb);
+    new_cb = PJ_POOL_ZALLOC_T(endpt->pool, exit_cb);
     new_cb->func = func;
 
     pj_mutex_lock(endpt->mutex);

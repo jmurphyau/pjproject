@@ -36,8 +36,6 @@
  * to create a media session (#pjmedia_session_create()).
  */
 
-#include <pj/config.h>
-#include <pj/config_spm.h>
 #include <pjmedia/codec.h>
 #include <pjmedia/sdp.h>
 #include <pjmedia/transport.h>
@@ -45,55 +43,6 @@
 
 
 PJ_BEGIN_DECL
-#define MAX_THREADS     16
-/**
- * Type of callback to register to pjmedia_endpt_atexit().
- */
-typedef void (*pjmedia_endpt_exit_callback)(pjmedia_endpt *endpt);
-
-/* List of media endpoint exit callback. */
-typedef struct exit_cb
-{
-    PJ_DECL_LIST_MEMBER             (struct exit_cb);
-    pjmedia_endpt_exit_callback     func;
-} exit_cb;
-
-
-/** Concrete declaration of media endpoint. */
-struct pjmedia_endpt
-{
-    /** Pool. */
-    pj_pool_t            *pool;
-
-    /** Pool factory. */
-    pj_pool_factory      *pf;
-
-    /** Codec manager. */
-    pjmedia_codec_mgr     codec_mgr;
-
-    /** IOqueue instance. */
-    pj_ioqueue_t         *ioqueue;
-
-    /** Do we own the ioqueue? */
-    pj_bool_t             own_ioqueue;
-
-    /** Number of threads. */
-    unsigned              thread_cnt;
-
-    /** IOqueue polling thread, if any. */
-    pj_thread_t          *thread[MAX_THREADS];
-
-    /** To signal polling thread to quit. */
-    pj_bool_t             quit_flag;
-
-    /** Is telephone-event enable */
-    pj_bool_t             has_telephone_event;
-
-    /** List of exit callback. */
-    exit_cb               exit_cb_list;
-};
-
-
 
 /**
  * This enumeration describes various flags that can be set or retrieved in
@@ -125,7 +74,10 @@ typedef struct pjmedia_endpt_create_sdp_param
 
 } pjmedia_endpt_create_sdp_param;
 
-
+/**
+ * Type of callback to register to pjmedia_endpt_atexit().
+ */
+typedef void (*pjmedia_endpt_exit_callback)(pjmedia_endpt *endpt);
 
 
 /**
